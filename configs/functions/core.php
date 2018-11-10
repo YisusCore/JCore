@@ -40,16 +40,6 @@ defined('ABSPATH') or exit('Acceso directo al archivo no autorizado');
  */
 defined('DS') or define('DS', DIRECTORY_SEPARATOR);
 
-/**
- * DIRECTORIO NÚCLEO JCORE
- *
- * La variable contiene la ruta a la carpeta del núcleo JCore.
- * WARNING: No debe finalizar en DS (Directory Separator)
- *
- * @internal
- */
-defined('ROOTPATH') or define('ROOTPATH', realpath(__DIR__ . DS . '..'));
-
 isset($BASES_path) or $BASES_path = [];
 
 //=========================================================
@@ -581,12 +571,12 @@ if ( ! function_exists('config'))
 
 			foreach($BASES_path_ as $path)
 			{
-				if ($file = $path. DS. 'the.configs'. DS. 'config.php' and file_exists($file))
+				if ($file = $path. DS. 'configs'. DS. 'config.php' and file_exists($file))
 				{
 					require_once $file;
 				}
 				
-				if ($file = $path. DS. 'the.configs'. DS. ENVIRONMENT. DS. 'config.php' and file_exists($file))
+				if ($file = $path. DS. 'configs'. DS. ENVIRONMENT. DS. 'config.php' and file_exists($file))
 				{
 					require_once $file;
 				}
@@ -637,12 +627,12 @@ if ( ! function_exists('_t'))
 
 			foreach($BASES_path_ as $path)
 			{
-				if ($file = $path. DS. 'translate'. DS. 'langs.php' and file_exists($file))
+				if ($file = $path. DS. 'configs' . DS . 'translate'. DS. 'langs.php' and file_exists($file))
 				{
 					require_once $file;
 				}
 				
-				if ($file = $path. DS. 'translate'. DS. ENVIRONMENT. DS. 'langs.php' and file_exists($file))
+				if ($file = $path. DS. 'configs' . DS . 'translate'. DS. ENVIRONMENT. DS. 'langs.php' and file_exists($file))
 				{
 					require_once $file;
 				}
@@ -1220,194 +1210,6 @@ if ( ! function_exists('url'))
 	}
 }
 
-if ( ! function_exists('uri_rewrite_rules'))
-{
-	/**
-	 * uri_rewrite_rules()
-	 * Obtiene las reglas de reescritura de los URIs
-	 *
-	 * @return	mixed
-	 */
-	function &uri_rewrite_rules()
-	{
-		static $rules = [];
-		
-		if (count($rules) === 0)
-		{
-			global $BASES_path;
-			
-			$BASES_path_ = array_reverse($BASES_path);
-
-			foreach($BASES_path_ as $path)
-			{
-				if ($file = $path. DS. 'the.configs'. DS. 'uri_rewrite_rules.php' and file_exists($file))
-				{
-					require_once $file;
-				}
-				
-				if ($file = $path. DS. 'the.configs'. DS. ENVIRONMENT. DS. 'uri_rewrite_rules.php' and file_exists($file))
-				{
-					require_once $file;
-				}
-			}
-
-			isset($config)  and $rules = array_merge($rules, $config);	## Deprecated
-			isset($rule)    and $rules = array_merge($rules, $rule);	## Deprecated
-			isset($route)   and $rules = array_merge($rules, $route);	## Deprecated
-			isset($routes)  and $rules = array_merge($rules, $routes);	## Deprecated
-			isset($filter)  and $rules = array_merge($rules, $filter);	## Deprecated
-			isset($filters) and $rules = array_merge($rules, $filters);	## Deprecated
-		}
-		
-		return $rules;
-	}
-}
-
-if ( ! function_exists('add_rewrite_rule'))
-{
-	/**
-	 * add_rewrite_rule()
-	 * Agrega una nueva regla de reescritura de url
-	 *
-	 * @param	string			$match
-	 * @param	string|callable	$newUri
-	 * @param	string|NULL		$method
-	 * @param	bool			$before
-	 * @return	mixed
-	 */
-	function add_rewrite_rule($match, $newUri, $method = NULL, $before = TRUE)
-	{
-		return APP()->Router->add_rewrite_rule($match, $newUri, $method, $before);
-	}
-}
-
-if ( ! function_exists('add_processor'))
-{
-	/**
-	 * add_processor()
-	 * Agrega nuevos callbacks de procesamientos para las URIs
-	 *
-	 * @param	string			$match
-	 * @param	string|NULL		$method
-	 * @param	array|callable	...$callbacks
-	 * @return	mixed
-	 */
-	function add_processor($match, $method, ...$callbacks)
-	{
-		array_unshift($callbacks, $method);
-		array_unshift($callbacks, $match);
-		
-		return call_user_func_array([APP()->Router, 'add_processor'], $callbacks);
-	}
-}
-
-if ( ! function_exists('add_display'))
-{
-	/**
-	 * add_display()
-	 * Agrega nuevo procesador display para las URIs
-	 *
-	 * @param	string			$match
-	 * @param	array|callable	$method (Optional) Defecto: ALL
-	 * @param	string|NULL		$method
-	 * @return	mixed
-	 */
-	function add_display($match, $display, $method = 'ALL')
-	{
-		return APP()->Router->add_display($match, $display, $method);
-	}
-}
-
-if ( ! function_exists('uri_processors'))
-{
-	/**
-	 * uri_processors()
-	 * Obtiene los callbacks routes
-	 *
-	 * @param	string	$return
-	 * @return	mixed
-	 */
-	function &uri_processors()
-	{
-		static $processors = [];
-		
-		if (count($processors) === 0)
-		{
-			global $BASES_path;
-			
-			$BASES_path_ = array_reverse($BASES_path);
-
-			foreach($BASES_path_ as $path)
-			{
-				if ($file = $path. DS. 'the.configs'. DS. 'uri_processors.php' and file_exists($file))
-				{
-					require_once $file;
-				}
-				
-				if ($file = $path. DS. 'the.configs'. DS. ENVIRONMENT. DS. 'uri_processors.php' and file_exists($file))
-				{
-					require_once $file;
-				}
-			}
-
-			isset($config)  and $processors = array_merge($processors, $config);	## Deprecated
-			isset($processor) and $processors = array_merge($processors, $processor);	## Deprecated
-			isset($process) and $processors = array_merge($processors, $process);	## Deprecated
-			isset($route)   and $processors = array_merge($processors, $route);		## Deprecated
-			isset($routes)  and $processors = array_merge($processors, $routes);	## Deprecated
-			isset($filter)  and $processors = array_merge($processors, $filter);	## Deprecated
-			isset($filters) and $processors = array_merge($processors, $filters);	## Deprecated
-		}
-		
-		return $processors;
-	}
-}
-
-if ( ! function_exists('uri_displays'))
-{
-	/**
-	 * uri_displays()
-	 * Obtiene los callbacks routes
-	 *
-	 * @param	string	$return
-	 * @return	mixed
-	 */
-	function &uri_displays()
-	{
-		static $displays = [];
-		
-		if (count($displays) === 0)
-		{
-			global $BASES_path;
-			
-			$BASES_path_ = array_reverse($BASES_path);
-
-			foreach($BASES_path_ as $path)
-			{
-				if ($file = $path. DS. 'the.configs'. DS. 'uri_displays.php' and file_exists($file))
-				{
-					require_once $file;
-				}
-				
-				if ($file = $path. DS. 'the.configs'. DS. ENVIRONMENT. DS. 'uri_displays.php' and file_exists($file))
-				{
-					require_once $file;
-				}
-			}
-
-			isset($config)  and $displays = array_merge($displays, $config);	## Deprecated
-			isset($display) and $displays = array_merge($displays, $display);	## Deprecated
-			isset($process) and $displays = array_merge($displays, $process);	## Deprecated
-			isset($route)   and $displays = array_merge($displays, $route);		## Deprecated
-			isset($routes)  and $displays = array_merge($displays, $routes);	## Deprecated
-			isset($filter)  and $displays = array_merge($displays, $filter);	## Deprecated
-			isset($filters) and $displays = array_merge($displays, $filters);	## Deprecated
-		}
-		
-		return $displays;
-	}
-}
-
 if ( ! function_exists('class2'))
 {
 	/**
@@ -1462,6 +1264,10 @@ if ( ! function_exists('class2'))
 			case 'd':case 'di':case 'dis':case 'display':case 'displays':case 'view':case 'views':case 3:
 				$dir = 'displays';
 				$class_base = 'Display';
+				break;
+			case 'c':case 'cl':case 'cls':case 'clas':case 'class':case 'classes':case 4:
+				$dir = 'configs' . DS . 'classes';
+				$class_base = '';
 				break;
 			default:
 				$class_base = '';
@@ -1554,6 +1360,7 @@ if ( ! function_exists('class2'))
 					$version = str_replace('v', '', $version);
 					$version = str_replace('V', '', $version);
 					$version = str_replace('_', '.', $version);
+
 					$version = trim($version, '.');
 					
 					(ucfirst($version) === 'Last' or empty($version)) and $version = '999999.999999.9999' . $lvl;
@@ -1685,8 +1492,6 @@ if ( ! function_exists('class2'))
 			}
 		}
 		
-//$dir === 'objects' and ! in_array($class, ['Usuario', 'Empresa\Marca\Sucursal', 'Almacen', 'Empresa', 'Empresa\Marca', 'Login']) and die_array($_founds[$class], $class);
-		
 		uksort($_founds[$class][$dir], function($a, $b){
 			return version_compare($a, $b, '<');
 		});
@@ -1758,26 +1563,31 @@ if ( ! function_exists('obj'))
 	 * @param mixed $id Parametros a enviar al constructor de la clase
 	 * @return string
 	 */
-	function obj($class, $id = NULL, $ver = NULL)
+	function &obj($class, $id = NULL, $ver = NULL)
 	{
-//		if (is_null($id) and mb_strtolower($ver) !== 'last' and ! is_version($ver))
-//		{
-//			$id = $ver;
-//		}
-		
 		static $_founds = [];
-		
+
+		if ($class === 'return')
+		{
+			return $_founds;
+		}
+
 		isset($_founds[$class]) or $_founds[$class] = [];
-		
+
+		if ($id === 'return')
+		{
+			return $_founds[$class];
+		}
+
 		if ( ! is_null($id) and isset($_founds[$class][$id]))
 		{
 			return $_founds[$class][$id];
 		}
 
 		$obj = class2($class, 'Object', $ver, $id);
-		
+
 		is_null($id) or $_founds[$class][$id] = $obj;
-		
+
 		return $obj;
 	}
 }
@@ -2683,7 +2493,7 @@ if ( ! function_exists('get_image'))
 
 		$the_file_path = $abspath . str_replace('/', DS, $the_file);
 
-		$time = filemtime($real_file);
+		$time = file_exists($real_file) ? filemtime($real_file) : 404;
 		if (file_exists($the_file_path))
 		{
 			$_time = filemtime($the_file_path);
@@ -2979,16 +2789,9 @@ if ( ! function_exists('_autoload'))
 		 */
 		static $_groups = [
 			'Exception', 
-			'Model', 
-			'Controller',
-			'Page', 
 			'Object', 
 			'Output'
 		];
-		
-		if ($class === 'Object\Empresa\Marca\Sucursal') define('debug', true);
-// 		if ($class === 'xmlapi') define('debug', true);
-// 		defined('debug') and debug and die_array($class, true);
 		
 		/**
 		 * $_directorys
@@ -2996,7 +2799,7 @@ if ( ! function_exists('_autoload'))
 		 */
 		static $_directorys = [
 			'displays', 'objects', 'processors',
-			'the.classes', 'the.libs'
+			'configs'.DS.'classes', 'configs'.DS.'libs'
 		];
 
 		/**
@@ -3024,9 +2827,9 @@ if ( ! function_exists('_autoload'))
 		 */
 		$class_name = array_pop($class_structure);
 		
-		$class_name === 'ObjectTable' and $class !== 'Object\ObjectTable' and $class_async = '\Object\ObjectTable';
-		$class_name === 'BasicException' and $class !== 'BasicException' and $class_async = '\BasicException';
-		$class_name === 'JArray' and $class !== 'JArray' and $class_async = '\JArray';
+		$class_name === 'ObjectTable'    and $class !== 'Object\ObjectTable' and $class_async = '\Object\ObjectTable';
+		$class_name === 'BasicException' and $class !== 'BasicException'     and $class_async = '\BasicException'    ;
+		$class_name === 'JArray'         and $class !== 'JArray'             and $class_async = '\JArray'            ;
 		
 		if (count($class_structure) > 0)
 		{
@@ -3354,6 +3157,197 @@ if ( ! function_exists('_shutdown_handler'))
 		action_apply('shutdown');
 		
 		flush();
+	}
+}
+
+
+
+
+if ( ! function_exists('uri_rewrite_rules'))
+{
+	/**
+	 * uri_rewrite_rules()
+	 * Obtiene las reglas de reescritura de los URIs
+	 *
+	 * @return	mixed
+	 */
+	function &uri_rewrite_rules()
+	{
+		static $rules = [];
+		
+		if (count($rules) === 0)
+		{
+			global $BASES_path;
+			
+			$BASES_path_ = array_reverse($BASES_path);
+
+			foreach($BASES_path_ as $path)
+			{
+				if ($file = $path. DS. 'configs'. DS. 'uri_rewrite_rules.php' and file_exists($file))
+				{
+					require_once $file;
+				}
+				
+				if ($file = $path. DS. 'configs'. DS. ENVIRONMENT. DS. 'uri_rewrite_rules.php' and file_exists($file))
+				{
+					require_once $file;
+				}
+			}
+
+			isset($config)  and $rules = array_merge($rules, $config);	## Deprecated
+			isset($rule)    and $rules = array_merge($rules, $rule);	## Deprecated
+			isset($route)   and $rules = array_merge($rules, $route);	## Deprecated
+			isset($routes)  and $rules = array_merge($rules, $routes);	## Deprecated
+			isset($filter)  and $rules = array_merge($rules, $filter);	## Deprecated
+			isset($filters) and $rules = array_merge($rules, $filters);	## Deprecated
+		}
+		
+		return $rules;
+	}
+}
+
+if ( ! function_exists('add_rewrite_rule'))
+{
+	/**
+	 * add_rewrite_rule()
+	 * Agrega una nueva regla de reescritura de url
+	 *
+	 * @param	string			$match
+	 * @param	string|callable	$newUri
+	 * @param	string|NULL		$method
+	 * @param	bool			$before
+	 * @return	mixed
+	 */
+	function add_rewrite_rule($match, $newUri, $method = NULL, $before = TRUE)
+	{
+		return APP()->Router->add_rewrite_rule($match, $newUri, $method, $before);
+	}
+}
+
+if ( ! function_exists('add_processor'))
+{
+	/**
+	 * add_processor()
+	 * Agrega nuevos callbacks de procesamientos para las URIs
+	 *
+	 * @param	string			$match
+	 * @param	string|NULL		$method
+	 * @param	array|callable	...$callbacks
+	 * @return	mixed
+	 */
+	function add_processor($match, $method, ...$callbacks)
+	{
+		array_unshift($callbacks, $method);
+		array_unshift($callbacks, $match);
+		
+		return call_user_func_array([APP()->Router, 'add_processor'], $callbacks);
+	}
+}
+
+if ( ! function_exists('add_display'))
+{
+	/**
+	 * add_display()
+	 * Agrega nuevo procesador display para las URIs
+	 *
+	 * @param	string			$match
+	 * @param	array|callable	$method (Optional) Defecto: ALL
+	 * @param	string|NULL		$method
+	 * @return	mixed
+	 */
+	function add_display($match, $display, $method = 'ALL')
+	{
+		return APP()->Router->add_display($match, $display, $method);
+	}
+}
+
+if ( ! function_exists('uri_processors'))
+{
+	/**
+	 * uri_processors()
+	 * Obtiene los callbacks routes
+	 *
+	 * @param	string	$return
+	 * @return	mixed
+	 */
+	function &uri_processors()
+	{
+		static $processors = [];
+		
+		if (count($processors) === 0)
+		{
+			global $BASES_path;
+			
+			$BASES_path_ = array_reverse($BASES_path);
+
+			foreach($BASES_path_ as $path)
+			{
+				if ($file = $path. DS. 'configs'. DS. 'uri_processors.php' and file_exists($file))
+				{
+					require_once $file;
+				}
+				
+				if ($file = $path. DS. 'configs'. DS. ENVIRONMENT. DS. 'uri_processors.php' and file_exists($file))
+				{
+					require_once $file;
+				}
+			}
+
+			isset($config)  and $processors = array_merge($processors, $config);	## Deprecated
+			isset($processor) and $processors = array_merge($processors, $processor);	## Deprecated
+			isset($process) and $processors = array_merge($processors, $process);	## Deprecated
+			isset($route)   and $processors = array_merge($processors, $route);		## Deprecated
+			isset($routes)  and $processors = array_merge($processors, $routes);	## Deprecated
+			isset($filter)  and $processors = array_merge($processors, $filter);	## Deprecated
+			isset($filters) and $processors = array_merge($processors, $filters);	## Deprecated
+		}
+		
+		return $processors;
+	}
+}
+
+if ( ! function_exists('uri_displays'))
+{
+	/**
+	 * uri_displays()
+	 * Obtiene los callbacks routes
+	 *
+	 * @param	string	$return
+	 * @return	mixed
+	 */
+	function &uri_displays()
+	{
+		static $displays = [];
+		
+		if (count($displays) === 0)
+		{
+			global $BASES_path;
+			
+			$BASES_path_ = array_reverse($BASES_path);
+
+			foreach($BASES_path_ as $path)
+			{
+				if ($file = $path. DS. 'configs'. DS. 'uri_displays.php' and file_exists($file))
+				{
+					require_once $file;
+				}
+				
+				if ($file = $path. DS. 'configs'. DS. ENVIRONMENT. DS. 'uri_displays.php' and file_exists($file))
+				{
+					require_once $file;
+				}
+			}
+
+			isset($config)  and $displays = array_merge($displays, $config);	## Deprecated
+			isset($display) and $displays = array_merge($displays, $display);	## Deprecated
+			isset($process) and $displays = array_merge($displays, $process);	## Deprecated
+			isset($route)   and $displays = array_merge($displays, $route);		## Deprecated
+			isset($routes)  and $displays = array_merge($displays, $routes);	## Deprecated
+			isset($filter)  and $displays = array_merge($displays, $filter);	## Deprecated
+			isset($filters) and $displays = array_merge($displays, $filters);	## Deprecated
+		}
+		
+		return $displays;
 	}
 }
 

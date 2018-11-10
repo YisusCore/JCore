@@ -31,15 +31,6 @@
 
 defined('ABSPATH') or exit('Acceso directo al archivo no autorizado');
 
-/**
- * DIRECTORY_SEPARATOR
- *
- * Separador de Directorios para el sistema operativo de ejecución
- *
- * @global
- */
-defined('DS') or define('DS', DIRECTORY_SEPARATOR);
-
 //--------------------------------------------------------------------
 // Funciones Generales
 //--------------------------------------------------------------------

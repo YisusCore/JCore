@@ -177,6 +177,40 @@ if ( ! function_exists('cbd'))
 	}
 }
 
+if ( ! function_exists('sql_start'))
+{
+	/**
+	 * sql_start()
+	 * Ejecuta la función `mysqli_real_escape_string`
+	 *
+	 * @usedBy qp_esc
+	 * @param string
+	 * @param mysqli
+	 * @return string
+	 */
+	function sql_start (){
+		global $CON;
+		
+		if ( ! is_null($CON))
+		{
+			return $CON;
+		}
+		
+		$db =& config('db');
+
+		if ( ! is_empty($db))
+		{
+			isset($db['host']) or $db['host'] = 'localhost';
+			isset($db['user']) or $db['user'] = 'root';
+			isset($db['pasw']) or $db['pasw'] = NULL;
+
+			return cbd($db['host'], $db['user'], $db['pasw'], $db['name']);
+		}
+		
+		return NULL;
+	}
+}
+
 if ( ! function_exists('esc'))
 {
 	/**

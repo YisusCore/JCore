@@ -41,6 +41,65 @@ defined('ABSPATH') or exit('Acceso directo al archivo no autorizado');
 defined('DS') or define('DS', DIRECTORY_SEPARATOR);
 
 
+if ( ! function_exists('redirect_default_www'))
+{
+	function redirect_default_www ()
+	{
+		$WWW =& url('www');
+		$WWW_def =& config('www', ['www' => NULL]);
+
+		if ( ! is_null($WWW_def) and $WWW !== $WWW_def)
+		{
+			$host =& url('host');
+
+			if ($WWW_def)
+			{
+				$host = 'www.' . $host;
+			}
+			else
+			{
+				$host = preg_replace('/^www\./i', '', $host);
+			}
+
+			redirect(build_url(url('array')));
+		}
+	};
+}
+
+if ( ! function_exists('redirect_default_protocol'))
+{
+	function redirect_default_protocol ()
+	{
+		$HTTPS =& url('https');
+		$HTTPS_def =& config('https');
+
+		if ( ! is_null($HTTPS_def) and $HTTPS !== $HTTPS_def)
+		{
+			$scheme =& url('scheme');
+
+			$scheme = $HTTPS_def ? 'https' : 'http';
+			redirect(build_url(url('array')));
+		}
+	};
+}
+
+if ( ! function_exists('check_image_slug'))
+{
+	function check_image_slug ()
+	{
+		$images_zones = (array)config('images_zones');
+		foreach (array_reverse($images_zones) as $zone)
+		{
+			if (preg_match('#'.regex($zone['uri']).'#i', url()) && RTR()->portal() === ucfirst($zone['slug']))
+			{
+				$mng = new ImageMng($zone);
+				$mng-> processUrl();
+				break;
+			}
+		}
+	};
+}
+
 
 if ( ! function_exists('subdomain'))
 {

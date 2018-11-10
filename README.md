@@ -1,4 +1,4 @@
-# JCore V3
+# JCore V3.2
 
 Copyright (c) 2018 - 2023, JYS Perú
 
@@ -15,10 +15,34 @@ EN NINGÚN CASO LOS AUTORES O PROPIETARIOS DE DERECHOS DE AUTOR SERÁN RESPONSAB
 @version		1.0.0<br>
 @copyright	Copyright (c) 2018 - 2023, JYS Perú (https://www.jys.pe/)<br>
 
+### Requerimientos
+
+##### Versión PHP
+- [x] `5.7`
+
+##### Módulos Apache
+- [x] `mod_rewrite`
+- [ ] `mod_cache`
+- [ ] `mod_deflate`
+- [ ] `mod_expires`
+- [ ] `mod_filter`
+- [ ] `mod_headers`
+
+##### Extensiones PHP
+- [x] `mbstring`
+- [x] `iconv`
+- [x] `zip`
+- [x] `json`
+- [x] `session`
+- [x] `curl`
+- [x] `gd`
+- [x] `mysqli`
+- [x] `hash`
+- [ ] `fileinfo`
+
 ## CARACTERÍSTICAS DE LA VERSIÓN
 
 ### Variables Globales
-
 
 Variable | Nombre | Descripción
 ---|---|---
@@ -26,10 +50,9 @@ DS | DIRECTORY_SEPARATOR | Separador de Directorios
 HOMEPATH | DIRECTORIO DEL SITIO  | Directorio Raiz de donde es leído el APP
 SUBPATH | SUBDIRECTORIO DEL SITIO | Subdirectorio donde se encuentra alojado el archivo `init.php`
 ABSPATH | DIRECTORIO ABSOLUTO DEL SITIO | Carpeta donde se encuentra alojado el `init.php`
+ROOTPATH | NÚCLEO JCORE | Ruta a la carpeta del núcleo JCore
+APPPATH | PROCESOS DE APLICACIÓN | Ruta a la carpeta que contiene las funciones, configuraciones, objetos, procesadores y pantallas
 ENVIRONMENT | AMBIENTE DE DESARROLLO | **Posibles valores:** <br>- desarrollo<br>- pruebas<br>- produccion
-$server_validation | VALIDACIÓN PHP VERSION, APACHE MODULS, PHP EXTENSIONS | Por defecto `FALSE`<BR>Si `TRUE`, entonces se valida todo lo requerido para un buen funcionamiento del sistema
-$JCore_path | NÚCLEO JCORE | Ruta a la carpeta del núcleo JCore
-$APP_path | PROCESOS DE APLICACIÓN | Ruta a la carpeta que contiene las funciones, configuraciones, objetos, procesadores y pantallas
 $BASES_path | DIRECTORIOS BASES | Array de los directorios base que buscará las estructuras de archivos<br>Se autoagregan los directorios `$APP_path` y `$JCore_path`
 
 
@@ -132,29 +155,4 @@ pasw | `String` | Clave de la conección.´<BR>(Si es NULO entonces el usuario n
 name | `String` | Nombre de la base datos autorizado | `intranet`
 pref | `String` | Prefijo que se utilizará para la creación de tablas por defecto | `jc_`
 
-
-
-<br>
-
-### Requerimientos
-
-##### Módulos Apache
-- [x] `mod_rewrite`
-- [ ] `mod_cache`
-- [ ] `mod_deflate`
-- [ ] `mod_expires`
-- [ ] `mod_filter`
-- [ ] `mod_headers`
-
-##### Extensiones PHP
-- [x] `mbstring`
-- [x] `iconv`
-- [x] `zip`
-- [x] `json`
-- [x] `session`
-- [x] `curl`
-- [x] `gd`
-- [x] `mysqli`
-- [x] `hash`
-- [ ] `fileinfo`
 

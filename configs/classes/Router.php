@@ -1,14 +1,77 @@
 <?php
+/**
+ * JCore.php
+ * 
+ * El núcleo inicializa todas las funciones básicas y todas las configuraciones mínimas.
+ *
+ * Copyright (c) 2018 - 2023, JYS Perú
+ *
+ * Se otorga permiso, de forma gratuita, a cualquier persona que obtenga una copia de este software 
+ * y archivos de documentación asociados (el "Software"), para tratar el Software sin restricciones, 
+ * incluidos, entre otros, los derechos de uso, copia, modificación y fusión. , publicar, distribuir, 
+ * sublicenciar y / o vender copias del Software, y permitir a las personas a quienes se les 
+ * proporciona el Software que lo hagan, sujeto a las siguientes condiciones:
+ *
+ * El aviso de copyright anterior y este aviso de permiso se incluirán en todas las copias o 
+ * porciones sustanciales del software.
+ *
+ * EL SOFTWARE SE PROPORCIONA "TAL CUAL", SIN GARANTÍA DE NINGÚN TIPO, EXPRESA O IMPLÍCITA, INCLUIDAS,
+ * ENTRE OTRAS, LAS GARANTÍAS DE COMERCIABILIDAD, IDONEIDAD PARA UN PROPÓSITO PARTICULAR Y NO INFRACCIÓN.
+ * EN NINGÚN CASO LOS AUTORES O PROPIETARIOS DE DERECHOS DE AUTOR SERÁN RESPONSABLES DE CUALQUIER RECLAMO, 
+ * DAÑO O CUALQUIER OTRO TIPO DE RESPONSABILIDAD, YA SEA EN UNA ACCIÓN CONTRACTUAL, AGRAVIO U OTRO, 
+ * DERIVADOS, FUERA DEL USO DEL SOFTWARE O EL USO U OTRAS DISPOSICIONES DEL SOFTWARE.
+ *
+ * @package		JCore\Router
+ * @author		YisusCore
+ * @link		https://jcore.jys.pe/classes
+ * @version		1.0.2
+ * @copyright	Copyright (c) 2018 - 2023, JYS Perú (https://www.jys.pe/)
+ * @filesource
+ */
+
+defined('ABSPATH') or exit('Acceso directo al archivo no autorizado');
+
+/**
+ * DIRECTORY_SEPARATOR
+ *
+ * Separador de Directorios para el sistema operativo de ejecución
+ *
+ * @global
+ */
+defined('DS') or define('DS', DIRECTORY_SEPARATOR);
+
+/**
+ * Router
+ * Clase Principal JCore
+ */
 
 class Router
 {
-	private static $instance;
+	/**
+	 * Versión de la Clase
+	 * @constant
+	 * @global
+	 */
+	const version = '1.0.2';
+	
+	//===================================================================
+	// Statics
+	//===================================================================
+
+	/**
+	 * Función para llamar la instancia de la aplicación
+	 * @static
+	 * @return APP La instancia de la Aplicación
+	 */
 	public static function &instance()
 	{
-		isset(self::$instance) or self::$instance = new self();
-		return self::$instance;
-	}
+		static $instance;
+		
+		isset($instance) or $instance = new self();
 
+		return $instance;
+	}
+	
 	/**
 	 * $http_methods
 	 * Listado de Métodos de llamadas
@@ -147,28 +210,36 @@ class Router
 
 	public function init()
 	{
-		if (isset($this->_uri_processors['__init__']))
+		/**
+		 * Variable para saber si la clase ya ha sido inicializada
+		 */
+		static $_inited = FALSE;
+		
+		if ($_inited)
 		{
-			exec_callable($this->_uri_processors['__init__']);
-			unset($this->_uri_processors['__init__']);
+			return $this;
 		}
+		
+		$_inited = TRUE;
 
-		if (isset($this->_uri_processors['__init__' . $this->http_verb]))
+		/**
+		 * Instancia de APP
+		 */
+		$this->APP = APP();
+		
+		/**
+		 * Recorrer funciones preparatorias
+		 */
+		foreach(['__init__', '__prepare__', 'authentication', '__loaded__'] as $kwrd)
 		{
-			exec_callable($this->_uri_processors['__init__' . $this->http_verb]);
-			unset($this->_uri_processors['__init__' . $this->http_verb]);
-		}
-
-		if (isset($this->_uri_processors['authentication']))
-		{
-			exec_callable($this->_uri_processors['authentication']);
-			unset($this->_uri_processors['authentication']);
-		}
-
-		if (isset($this->_uri_processors['authentication' . $this->http_verb]))
-		{
-			exec_callable($this->_uri_processors['authentication' . $this->http_verb]);
-			unset($this->_uri_processors['authentication' . $this->http_verb]);
+			foreach(['', $this->http_verb] as $hvrb)
+			{
+				if (isset($this->_uri_processors[$kwrd . $hvrb]))
+				{
+					exec_callable($this->_uri_processors[$kwrd . $hvrb]);
+					unset($this->_uri_processors[$kwrd . $hvrb]);
+				}
+			}
 		}
 		
 		$this->process_uri();
@@ -617,42 +688,6 @@ class Router
 		return $return;
 	}
 
-
-	
-	/**
-	 * Función que valida si la clase y la funcion exista
-	 * @param srting|object $class_name Nombre de la clase o la clase ya creada
-	 * @param srting $class_method Método de la Clase
-	 * @param srting|NULL $class_version Posible Versión de la Clase
-	 * @param srting|array $class_suffix Posibles Sufijos de la Clase
-	 * @param array $array Array que contendra los datos correctos del callback
-	 * @return bool
-	 */
-	protected function _valid_callback_class($class_name, $class_method, $class_version = NULL, $class_suffix = [], 
-											 &$array = [])
-	{
-		
-		## Clase Correcta encontrada
-		$class = new $class_name();
-		
-		## Llamando a la función como pública
-		$array = [$class, $class_method];
-		if (is_callable($array))
-		{
-			return TRUE;
-		}
-		
-		## Llamando a la función como estática
-		$array = [$class_name, $class_method];
-		if (is_callable($array))
-		{
-			return TRUE;
-		}
-		
-		$array = [];
-		return FALSE;
-	}
-	
 	/**
 	 * Retorna el nombre y la versión de la clase
 	 * @return string
@@ -669,6 +704,7 @@ class Router
 	public function __debugInfo()
 	{
 		return [
+			'_' => $this->__toString(),
 			'http_verb'      => $this->http_verb,
 			'uri_real'       => $this->uri_real,
 			'uri'            => $this->uri,
@@ -677,7 +713,7 @@ class Router
 			'uri_processors' => $this->uri_processors,
 			'uri_display'    => $this->uri_display,
 			'uri_parsed'     => $this->uri_parsed,
-			'portal'     => $this->portal,
+			'portal'         => $this->portal,
 		];
 	}
 	

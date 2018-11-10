@@ -24,7 +24,7 @@
  * @package		JCore\APP
  * @author		YisusCore
  * @link		https://jcore.jys.pe/classes
- * @version		1.0.0
+ * @version		1.0.2
  * @copyright	Copyright (c) 2018 - 2023, JYS Perú (https://www.jys.pe/)
  * @filesource
  */
@@ -41,7 +41,7 @@ defined('ABSPATH') or exit('Acceso directo al archivo no autorizado');
 defined('DS') or define('DS', DIRECTORY_SEPARATOR);
 
 /**
- * JCore
+ * APP
  * Clase Principal JCore
  */
 class APP implements ArrayAccess
@@ -51,18 +51,11 @@ class APP implements ArrayAccess
 	 * @constant
 	 * @global
 	 */
-	const version = '1.0';
+	const version = '1.0.2';
 	
 	//===================================================================
 	// Statics
 	//===================================================================
-
-	/**
-	 * Instancia de Clase
-	 * @static
-	 * @global
-	 */
-	private static $instance;
 
 	/**
 	 * Función para llamar la instancia de la aplicación
@@ -71,9 +64,11 @@ class APP implements ArrayAccess
 	 */
 	public static function &instance()
 	{
-		isset(self::$instance) or self::$instance = new self();
+		static $instance;
+		
+		isset($instance) or $instance = new self();
 
-		return self::$instance;
+		return $instance;
 	}
 	
 	/**
@@ -81,7 +76,8 @@ class APP implements ArrayAccess
 	 * @static
 	 * @global
 	 */
-	protected static $error_levels = [
+	protected static $error_levels = 
+	[
 		E_ERROR			=>	'Error',				
 		E_WARNING		=>	'Warning',				
 		E_PARSE			=>	'Parsing Error',		
@@ -101,83 +97,15 @@ class APP implements ArrayAccess
 		E_STRICT		=>	'Runtime Notice'		
 	];
 
-	/**
-	 * Listado de Clases a leer
-	 * @static
-	 * @global
-	 */
-	protected static $clases = [
-		'BenchMark', // Encargado de los puntos de procesos
-		'Response',  // Encargado de manejar la respuesta del navegador
-		'Router'     // Encargado de analizar los processors y displays para el response
-	];
-	
-	/**
-	 * Listado de Funciones a leer
-	 * @static
-	 * @global
-	 */
-	protected static $funciones = [
-		'mark', 
-		'template', 
-		'redirect', 
-		'ip_address',
-		'add_rewrite_rule',
-		'add_processor',
-		'add_display'
-	];
-	
 	//===================================================================
 	// Variables
 	//===================================================================
 	
 	/**
-	 * Variable para almacenar la configuración
-	 * @global
-	 */
-	public $config = [];
-	
-	/**
-	 * Variable para almacenar los datos de la URL
-	 * @global
-	 */
-	public $url = [];
-	
-	/**
-	 * Variable para almacenar la IP del usuario
-	 * @global
-	 */
-	public $ip_address;
-	
-	/**
-	 * Variable para almacenar la primera Conección a la Base Datos
-	 * @global
-	 */
-	public $CON;
-
-	/**
-	 * Variable para almacenar todas las conecciones de la Base Datos
-	 * @global
-	 */
-	public $CONs;
-
-	/**
-	 * Variable para almacenar todas las funciones realizables por la clase
-	 * @protected
-	 */
-	protected $functions = [];
-
-	/**
 	 * Variable para almacenar todas las variables usables por la clase
 	 * @protected
 	 */
 	protected $variables = [];
-
-	//===================================================================
-	// Constructor
-	//===================================================================
-	protected function __construct()
-	{}
 
 	/**
 	 * Inicializador de la clase
@@ -192,114 +120,122 @@ class APP implements ArrayAccess
 		
 		if ($_inited)
 		{
-			return;
+			return $this;
 		}
 		
 		$_inited = TRUE;
 
 		/**
-		 * LLamando a las variables Globales
-		 */
-		global $CON, $CONs;
-
-		$this->CON =& $CON;
-		$this->CONs =& $CONs;
-		
-		/**
-		 * Obteniendo las configuraciones
-		 */
-		$this->config =& config('array');
-		$config =& $this->config;
-
-		/**
 		 * Obteniendo la codificación de caracteres
 		 */
-		$this->variables['charset'] =& config('charset', ['charset' => 'UTF-8']);
+		$this->variables['charset'] =& config('charset');
 		$this->_charset_updated();
 
 		/**
 		 * Obteniendo la zona horaria
 		 */
-		$this->variables['timezone'] =& config('timezone', ['timezone'=>'America/Lima']);
+		$this->variables['timezone'] =& config('timezone');
 		$this->_timezone_updated();
 
 		/**
-		 * Obteniendo el IP del usuario
+		 * Obteniendo la clase RESPONSE
 		 */
-		$this->ip_address =& ip_address();
+		$this->variables['Response'] =& class2('Response', 'class');
 
 		/**
-		 * Obteniendo los datos de la URL
+		 * Obteniendo la clase ROUTER
 		 */
-		$this->url =& url('array');
-
-		/**
-		 * Leyendo las clases por defecto
-		 */
-		foreach(self::$clases as $class)
-		{
-			$this->variables[$class] = class2($class, 'class');
-		}
-		
-		/**
-		 * Leyendo las funciones por defecto
-		 */
-		foreach(self::$funciones as $function)
-		{
-			$this->functions[$function] = function () use ($function)
-			{
-				if (func_num_args() === 0)
-				{
-					return call_user_func($function);
-				}
-
-				return call_user_func_array($function, func_get_args());
-			};
-		}
+		$this->variables['Router'] =& class2('Router', 'class');
 
 		/**
 		 * Identificando los Métodos de Request autorizados
 		 */
-		( ! isset($config['allowed_http_methods']) or is_empty($config['allowed_http_methods'])) and $config['allowed_http_methods'] = ['GET', 'POST'];
-		is_array($config['allowed_http_methods']) or $config['allowed_http_methods'] = [$config['allowed_http_methods']];
+		$allowed_http_methods = (array)config('allowed_http_methods');
+		
+		$allowed_http_methods = array_map('mb_strtoupper', $allowed_http_methods); ## Convirtiendo todos a mayúsculas
 
-		$config['allowed_http_methods'] = array_map('mb_strtoupper', $config['allowed_http_methods']); ## Convirtiendo todos a mayúsculas
-
-		Router::$http_methods = array_merge(Router::$http_methods, $config['allowed_http_methods']); ## Agregando posibles faltantes
+		Router::$http_methods = array_merge(Router::$http_methods, $allowed_http_methods); ## Agregando posibles faltantes
 		Router::$http_methods = array_unique(Router::$http_methods); ## Eliminando duplicados
 
 		/**
-		 * Leyendo las funciones de REQUEST
+		 * Validando que se haya llamado con un REQUEST_METHOD autorizado
 		 */
-		foreach(Router::$http_methods as $method)
-		{
-			$method_lower = mb_strtolower($method);
-
-			$this->functions[$method_lower] = function($route, ...$callback) use ($method)
-			{
-				if ( ! in_array($method, $this->config['allowed_http_methods']))
-				{
-					user_error('HTTP Method `' . $method . '` not allowed');
-					exit();
-				}
-
-				$_params = $callback;
-				array_unshift($_params, $method);
-				array_unshift($_params, $route);
-
-				return call_user_func_array([$this->Router, 'add_processor'], $_params);
-			};
-		}
-		
-		if ( ! in_array($this->url['request_method'], $this->config['allowed_http_methods']))
-		{
-			throw new Exception('El método utilizado no está autorizado');
-		}
+		in_array(url('request_method'), $allowed_http_methods) or
+		RSP()
+			-> error('HTTP Method `' . $method . '` not allowed')
+			-> http_code(405, 'HTTP Method `' . $method . '` not allowed')
+			-> exit()
+		;
 	}
 	
-	//===================================================================
-	// Funciones
-	//===================================================================
+	public function run()
+	{
+		$Router = $this->Router;
+
+		$http_verb 	= $Router->http_verb();
+		$version 	= $Router->uri_version();
+		$uri	    = $Router->uri();
+		$ids 		= $Router->uri_ids();
+		$uri_parsed = $Router->uri_parsed();
+
+		$class_prms = $ids;
+		$params = $uri_parsed;
+
+		$processors = $Router->uri_processors();
+		
+		action_apply('dobefore_apprun_processor');
+		
+		foreach($processors as $processor)
+		{
+			if (is_array($processor) and count($processor) >= 3 and end($processor) === '__DEFAULT CLASS PROCESSOR__')
+			{
+				try
+				{
+					exec_callable($processor, $params, $class_prms, 'processors', $version);
+				}
+				catch (BasicException $e){
+
+					## Como es por defecto, no debe generar error si no encuentra la clase por defecto
+					if ( ! preg_match('/La función no se puede ejecutar/i', $e->getMessage()))
+					{
+						throw $e;
+					}
+				}
+
+				continue;
+			}
+
+			exec_callable($processor, $params, $class_prms, 'processors', $version);
+		}
+		
+		$display    = $Router->uri_display();
+		action_apply('dobefore_apprun_display');
+		
+		if (is_array($display) and count($display) >= 3 and end($display) === '__DEFAULT CLASS PROCESSOR__')
+		{
+			try
+			{
+				exec_callable($display, $params, $class_prms, 'displays', $version);
+				action_apply('doafter_apprun');
+				return TRUE; ## Finalizado
+			}
+			catch (BasicException $e){
+				## Como es por defecto, no debe generar error si no encuentra la clase por defecto
+				if ( ! preg_match('/La función no se puede ejecutar/i', $e->getMessage()))
+				{
+					throw $e;
+				}
+			}
+
+			## El display por defecto no ha podido procesarse así que toma el display del error 404
+			$display = [config('error404_display'), config('default_method')];
+		}
+		
+		exec_callable($display, $params, $class_prms, 'displays', $version);
+		action_apply('doafter_apprun');
+		
+		return TRUE; ## Finalizado
+	}
 	
 	/**
 	 * log()
@@ -316,9 +252,7 @@ class APP implements ArrayAccess
 	 */
 	public function log($message, $code = NULL, $severity = NULL, $meta = NULL, $filepath = NULL, $line = NULL, $trace = NULL, $show = TRUE)
 	{
-		isset($this->config['log']) OR $this->config['log'] = [];
-		
-		$config =& $this->config['log'];
+		$config = config('log');
 		
 		is_bool($code) and $show = $code and $code = NULL;
 		
@@ -330,10 +264,14 @@ class APP implements ArrayAccess
 		is_array($meta) or $meta = (array)$meta;
 		
 		$meta['time'] = time();
+		$meta['datetime'] = date2();
 		$meta['microtime'] = microtime();
 		$meta['microtime_float'] = microtime(true);
 		
-		$meta['buffer'] = OutputBuffering::instance()->stop()->getContents();
+		$meta['buffer'] = OutputBuffering::instance()
+			-> stop()
+			-> getContents()
+		;
 		
 		if ($message instanceof BasicException)
 		{
@@ -426,14 +364,6 @@ class APP implements ArrayAccess
 		
 		$saved = filter_apply('save_logs', $saved, $message, $severity, $code, $filepath, $line, $trace, $meta);
 		
-		// Guardar Log en BBDD
-		// guarda los logs en la bbdd, consume menos recursos que almacenarlo en un archivo físico
-		// PRIORIDAD I
-		if ( ! $saved)
-		{
-			// Hay alguna conección a BBDD, entonces intenta guardar en la tabla JC_logs
-		}
-		
 		// Guardar Log en Archivo
 		// almacena los logs en un archivo, solo agrega lineas
 		// PRIORIDAD II
@@ -519,74 +449,8 @@ class APP implements ArrayAccess
 				include @template('errors' . DS . 'php-error.php', FALSE);
 			}
 		}
-	}
-	
-	public function run()
-	{
-		$Router = $this->Router;
-
-		$http_verb 	= $Router->http_verb();
-		$version 	= $Router->uri_version();
-		$uri	    = $Router->uri();
-		$ids 		= $Router->uri_ids();
-		$uri_parsed = $Router->uri_parsed();
-
-		$class_prms = $ids;
-		$params = $uri_parsed;
-
-		$processors = $Router->uri_processors();
 		
-		action_apply('dobefore_apprun_processor');
-		
-		foreach($processors as $processor)
-		{
-			if (is_array($processor) and count($processor) >= 3 and end($processor) === '__DEFAULT CLASS PROCESSOR__')
-			{
-				try
-				{
-					exec_callable($processor, $params, $class_prms, 'processors', $version);
-				}
-				catch (BasicException $e){
-
-					## Como es por defecto, no debe generar error si no encuentra la clase por defecto
-					if ( ! preg_match('/La función no se puede ejecutar/i', $e->getMessage()))
-					{
-						throw $e;
-					}
-				}
-
-				continue;
-			}
-
-			exec_callable($processor, $params, $class_prms, 'processors', $version);
-		}
-		
-		$display    = $Router->uri_display();
-		action_apply('dobefore_apprun_display');
-		
-		if (is_array($display) and count($display) >= 3 and end($display) === '__DEFAULT CLASS PROCESSOR__')
-		{
-			try
-			{
-				exec_callable($display, $params, $class_prms, 'displays', $version);
-				action_apply('doafter_apprun');
-				return TRUE; ## Finalizado
-			}
-			catch (BasicException $e){
-				## Como es por defecto, no debe generar error si no encuentra la clase por defecto
-				if ( ! preg_match('/La función no se puede ejecutar/i', $e->getMessage()))
-				{
-					throw $e;
-				}
-			}
-
-			## El display por defecto no ha podido procesarse así que toma el display del error 404
-			$display = [config('error404_display'), config('default_method')];
-		}
-		
-		exec_callable($display, $params, $class_prms, 'displays', $version);
-		action_apply('doafter_apprun');
-		return TRUE; ## Finalizado
+		return $this;
 	}
 	
 	//=====================================================
@@ -625,12 +489,14 @@ class APP implements ArrayAccess
 		## Estableciendo los charsets a todo lo que corresponde
 		date_default_timezone_set($timezone);
 		
-		if (is_empty($this->CONs))
+		global $CONs;
+		
+		if (is_empty($CONs))
 		{
 			return;
 		}
 		
-		foreach($this->CONs as $conection)
+		foreach($CONs as $conection)
 		{
 			@mysqli_query($conection, 'SET time_zone = ' . qp_esc(getUTC()));
 		}
@@ -660,21 +526,21 @@ class APP implements ArrayAccess
 		$methods = array_values(get_class_methods($class));
 		
 		$vars = array_combine($vars, $vars);
-		unset($vars['instance']);
-		unset($vars['error_levels'], $vars['http_methods'], $vars['functions'], $vars['variables']);
+		unset($vars['error_levels'], $vars['variables']);
 		$vars = array_values($vars);
 		
 		$vars = array_merge($vars, array_keys($this->variables));
 		
 		$methods = array_combine($methods, $methods);
-		unset($methods['instance']);
+		unset($methods['instance'], $methods['init'], $methods['run']);
 		unset($methods['__construct'], $methods['__toString'], $methods['__debugInfo'], $methods['__call']);
+		unset($methods['__isset'], $methods['__unset'], $methods['__set'], $methods['__get']);
+		unset($methods['_charset_updated'], $methods['_timezone_updated']);
 		unset($methods['offsetExists'], $methods['offsetGet'], $methods['offsetSet'], $methods['offsetUnset']);
 		$methods = array_values($methods);
 		
-		$methods = array_merge($methods, array_keys($this->functions));
-		
 		return [
+			'_' => $this->__toString(),
 			'class' => $class,
 			'variables' => $vars,
 			'funciones' => $methods
@@ -730,16 +596,6 @@ class APP implements ArrayAccess
 		}
 		
 		return $this->variables[$name];
-    }
-	
-	public function __call($name, $arguments)
-    {
-		if ( ! isset($this->functions[$name]))
-		{
-			trigger_error('Function ´' . $name . '´ not loaded', E_USER_WARNING);
-		}
-		
-		return call_user_func_array($this->functions[$name], $arguments);
     }
 	
 	

@@ -91,7 +91,7 @@ $config['log'] = [];
 
 $config['log']['path'] = APPPATH . DS . 'logs';
 
-$config['log']['file_ext'] = 'csv';
+$config['log']['file_ext'] = 'txt';
 
 $config['log']['file_permissions'] = 0644;
 

@@ -31,15 +31,6 @@
 
 defined('ABSPATH') or exit('Acceso directo al archivo no autorizado');
 
-/**
- * DIRECTORY_SEPARATOR
- *
- * Separador de Directorios para el sistema operativo de ejecución
- *
- * @global
- */
-defined('DS') or define('DS', DIRECTORY_SEPARATOR);
-
 //--------------------------------------------------------------------
 // Variables Fijos
 //--------------------------------------------------------------------
@@ -80,7 +71,7 @@ if ( ! function_exists('letras'))
 			$return = $return[$n];
 		}
 		return $return;
-	}	
+	}
 }
 
 if ( ! function_exists('letras_may'))
@@ -100,7 +91,7 @@ if ( ! function_exists('letras_may'))
 			$return = $return[$n];
 		}
 		return $return;
-	}	
+	}
 }
 
 if ( ! function_exists('vocales'))
@@ -120,7 +111,7 @@ if ( ! function_exists('vocales'))
 			$return = $return[$n];
 		}
 		return $return;
-	}	
+	}
 }
 
 if ( ! function_exists('tildes'))
@@ -203,7 +194,7 @@ if ( ! function_exists('meses'))
 	 */
 	function meses($mode = NULL, $lang = NULL, $n = NULL)
 	{
-		$return = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Setiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+		$return = [NULL, 'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Setiembre', 'Octubre', 'Noviembre', 'Diciembre'];
 		
 		if (is_null($lang))
 		{
@@ -250,7 +241,7 @@ if ( ! function_exists('meses'))
 			$return = $return[(int)$n];
 		}
 		return $return;
-	}	
+	}
 }
 
 if ( ! function_exists('mes'))

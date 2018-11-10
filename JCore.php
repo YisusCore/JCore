@@ -23,13 +23,11 @@
  *
  * @package		JCore
  * @author		YisusCore
- * @link		https://jcore.jys.pe/jcore
- * @version		1.0.0
+ * @link		https://jcore.jys.pe/
+ * @version		1.0.1
  * @copyright	Copyright (c) 2018 - 2023, JYS Perú (https://www.jys.pe/)
  * @filesource
  */
-
-defined('ABSPATH') or exit('Acceso directo al archivo no autorizado');
 
 /**
  * DIRECTORY_SEPARATOR
@@ -49,7 +47,30 @@ defined('DS') or define('DS', DIRECTORY_SEPARATOR);
  *
  * @global
  */
-defined('HOMEPATH') or define('HOMEPATH', ABSPATH);
+defined('HOMEPATH') or exit('<br /><b>Fatal Error:</b> La variable HOMEPATH no definida.');
+
+/**
+ * SUBDIRECTORIO DEL SITIO
+ *
+ * Subdirectorio donde se encuentra alojado el archivo init.php {@see init.php}
+ *
+ * Si variable SUBPATH se encuentra vacío entonces la aplicación se 
+ * encuentra alojada en la misma carpeta del sitio.
+ *
+ * WARNING: No debe finalizar pero si empezar con DS (Directory Separator)
+ *
+ * @global
+ */
+defined('SUBPATH') or define('SUBPATH', DS);
+
+/**
+ * DIRECTORIO ABSOLUTO DEL SITIO
+ *
+ * Carpeta donde se encuentra alojado el init.php {@see init.php}
+ *
+ * @global
+ */
+defined('ABSPATH') or define('ABSPATH', realpath(HOMEPATH . SUBPATH));
 
 /**
  * DIRECTORIO NÚCLEO JCORE
@@ -59,8 +80,7 @@ defined('HOMEPATH') or define('HOMEPATH', ABSPATH);
  *
  * @internal
  */
-( ! isset($JCore_path) or empty($JCore_path)) and $JCore_path = __DIR__;
-define('ROOTPATH', $JCore_path);
+define('ROOTPATH', __DIR__);
 
 /**
  * DIRECTORIO PROCESOS DE APLICACIÓN
@@ -85,8 +105,45 @@ define('ROOTPATH', $JCore_path);
  *
  * @internal
  */
-( ! isset($APP_path) or empty($APP_path)) and $APP_path = ABSPATH;
-define('APPPATH',  $APP_path);
+defined('APPPATH') or define('APPPATH',  ABSPATH);
+
+/**
+ * ENVIRONMENT - AMBIENTE DE DESARROLLO
+ *
+ * Permite manejar distintas configuraciones dependientemente de 
+ * la etapa o fase en la que se encuentre la aplicación (proyecto)
+ *
+ * **Posibles valores:**
+ * *	desarrollo
+ * *	pruebas
+ * *	produccion
+ *
+ * @global
+ */
+defined('ENVIRONMENT') or define('ENVIRONMENT', 'desarrollo');
+
+/**
+ * ERROR REPORTING
+ *
+ * Dependientemente del ambiente de desarrollo, el sistema mostrará
+ * diferentes levels de errores.
+ *
+ * @internal
+ */
+switch (ENVIRONMENT)
+{
+	case 'pruebas':
+	case 'produccion':
+		ini_set('display_errors', 0);
+		error_reporting(E_ALL & ~E_NOTICE & ~E_DEPRECATED & ~E_STRICT & ~E_USER_NOTICE & ~E_USER_DEPRECATED);
+	break;
+
+	case 'desarrollo':
+	default:
+		ini_set('display_errors', 1);
+		error_reporting(-1);
+	break;
+}
 
 /**
  * VARIABLE JCore
@@ -107,44 +164,41 @@ $JC =& $JCore;
  *
  * @internal
  */
-isset($BASES_path) or $BASES_path = [APPPATH, ROOTPATH];
+isset($BASES_path) or $BASES_path = [];
 
-/**
- * VALIDACIÓN PHP VERSION, APACHE MODULS, PHP EXTENSIONS
- *
- * Se valida la versión de PHP mínima así como los módulos del apache y las 
- * extensiones de PHP requeridas para que funcione correctamente el SISTEMA
- */
-if ($server_validation)
+in_array(APPPATH, $BASES_path) or $BASES_path[] = APPPATH;
+in_array(ROOTPATH, $BASES_path) or $BASES_path[] = ROOTPATH;
+
+/** Verificando las carpetas base */
+foreach($BASES_path as &$path)
 {
-	$modules    = function_exists('apache_get_modules')    ? apache_get_modules()    : [];
-	$extensions = function_exists('get_loaded_extensions') ? get_loaded_extensions() : ['mbstring', 'iconv'];
-
-	if ( ! version_compare(PHP_VERSION, '5.6', '>='))
+	$_path = $path;
+	
+	if (($_temp = realpath($path)) !== FALSE)
 	{
-		die('<br /><b>PHP Versión: ' . phpversion() . '</b> Se requiere al menos Versión 5.6');
+		$path = $_temp;
+	}
+	else
+	{
+		$path = strtr(
+			rtrim($path, '/\\'),
+			'/\\',
+			DS.DS
+		);
 	}
 	
-	foreach (['mod_cache', 'mod_deflate', 'mod_expires', 'mod_filter', 'mod_headers', 'mod_mime', 'mod_rewrite'] as $module)
+	if ( ! is_dir($path) || ! file_exists($path))
 	{
-		if ( ! in_array($module, $modules))
-		{
-			die('<br /><b>Fatal Error:</b> Módulo de APACHE requerido `' . $module . '`');
-		}
+		header('HTTP/1.1 503 Service Unavailable.', TRUE, 503);
+		echo 'El directorio `' . $_path . '` no es correcto o no existe.';
+		exit(3); // EXIT_CONFIG
 	}
-	unset($module);
-
-	foreach (['zip', 'json', 'session', 'curl', 'fileinfo', 'gd', 'mysqli', 'hash', 'mbstring', 'iconv'] as $extension)
-	{
-		if ( ! in_array($extension, $extensions))
-		{
-			die('<br /><b>Fatal Error:</b> Extensión de PHP requerido `' . $extension . '`');
-		}
-	}
-	unset($extension);
 	
-	unset($modules, $extensions);
+	unset($path, $_path);
 }
+
+/** Corrigiendo directorio base cuando se ejecuta como comando */
+defined('STDIN') and chdir(APPPATH);
 
 /**
  * session_start
@@ -162,15 +216,15 @@ ob_start();
 
 /**
  * Cargando Archivo de Funciones básicas
- * El archivo _basic.php contiene todas las funciones básicas a utilizar en el sistema
+ * El archivo @basic.php contiene todas las funciones básicas a utilizar en el sistema
  *
  * @internal
  */
-require_once ROOTPATH . DS . 'the.functns' . DS . '_basic.php'; ## funciones básicas
+require_once ROOTPATH . DS . 'configs' . DS . 'functions' . DS . '@basic.php'; ## funciones básicas
 
 foreach($BASES_path as $basedir)
 {
-	if ($server_validation)
+	if (isset($server_validation) and $server_validation)
 	{
 		/**
 		 * Creando Directorios Base
@@ -178,12 +232,15 @@ foreach($BASES_path as $basedir)
 		 *
 		 * @internal
 		 */
-		foreach([
-			'displays', 'processors', 'objects', 'templates', 
-			'the.configs', 'the.functns', 'the.classes', 'the.libs', 'translate'
-		] as $dir)
+		
+		foreach(['displays', 'processors', 'objects', 'templates', 'configs'] as $dir)
 		{
 			mkdir2(DS . $dir, $basedir);
+		}
+		
+		foreach(['functions', 'classes', 'libs', 'translate'] as $dir)
+		{
+			mkdir2(DS . $dir, $basedir . DS . 'configs');
 		}
 	}
 
@@ -205,11 +262,11 @@ foreach($BASES_path as $basedir)
 		'mngr.url',		## Funciones manipuladores de (URL)
 	] as $file_name)
 	{
-		$file = $basedir . DS . 'the.functns' . DS . $file_name . '.php';
+		$file = $basedir . DS . 'configs' . DS . 'functions' . DS . $file_name . '.php';
 
 		if ( ! file_exists($file))
 		{
-			$server_validation and file_put_contents($file, '<?php' .PHP_EOL);
+			isset($server_validation) and $server_validation and file_put_contents($file, '<?php' .PHP_EOL);
 			continue;
 		}
 
@@ -250,18 +307,12 @@ set_exception_handler('_exception_handler');
 register_shutdown_function('_shutdown_handler');
 
 /**
- * LEYENDO ARCHIVOS DE FUNCIONES (Extras)
- * Recorre todas las funciones indicadas en la configuración
+ * Marcando el punto de proceso `total_execution_time_start`
+ * @see mark()
  *
  * @internal
  */
-foreach((array)config('functions_files') as $file)
-{
-	if (file_exists($file))
-	{
-		require_once $file;
-	}
-}
+mark('total_execution_time_start');
 
 /**
  * LEYENDO LOS HOOKS (Acciones programadas)
@@ -271,7 +322,7 @@ foreach((array)config('functions_files') as $file)
  */
 foreach($BASES_path as $basedir)
 {
-	if ($file = $basedir. DS. 'the.configs'. DS. 'hooks.php' AND file_exists($file))
+	if ($file = $basedir. DS. 'configs'. DS. 'hooks.php' and file_exists($file))
 	{
 		require_once $file;
 	}
@@ -285,7 +336,6 @@ foreach($BASES_path as $basedir)
  */
 action_apply('functions_loaded');
 
-
 /**
  * Inicializar el APP
  * Permite inicializar la clase APP y todo las configuraciones
@@ -293,14 +343,6 @@ action_apply('functions_loaded');
  * @internal
  */
 APP()->init();
-
-/**
- * Marcando el punto de proceso `total_execution_time_start`
- * @see mark()
- *
- * @internal
- */
-mark('total_execution_time_start');
 
 /**
  * EJECUTANDO ACCIÓN PROGRAMADA `core_start`
@@ -318,84 +360,69 @@ action_apply('core_start');
  */
 mark('core_start');
 
-## Validar si el UTF-8 està habilitado
-if (defined('PREG_BAD_UTF8_ERROR') && APP()->charset === 'UTF-8')
-{
-	/**
-	 * UTF8_ENABLED
-	 *
-	 * Variable que permite conocer si la codificación UTF8 está habilitado
-	 *
-	 * @global
-	 */
-	define('UTF8_ENABLED', TRUE);
-}
-else
-{
-	define('UTF8_ENABLED', FALSE);
-}
-
-/*
- * ------------------------------------------------------
- * Prioridad de WWW y HTTPS
- * ------------------------------------------------------
+/**
+ * UTF8_ENABLED
+ *
+ * Variable que permite conocer si la codificación UTF8 está habilitado
+ *
+ * @global
  */
-$WWW =& url('www');
-$WWW_def =& config('www', ['www' => NULL]);
+define('UTF8_ENABLED', defined('PREG_BAD_UTF8_ERROR') && APP()->charset === 'UTF-8');
 
-if ( ! is_null($WWW_def) and $WWW !== $WWW_def)
-{
-	$host =& url('host');
-	
-	if ($WWW_def)
-	{
-		$host = 'www.' . $host;
-	}
-	else
-	{
-		$host = preg_replace('/^www\./i', '', $host);
-	}
+/**
+ * Prioridad de WWW y HTTPS
+ */
+redirect_default_www ();
 
-	redirect(build_url(url('array')));
-}
+redirect_default_protocol ();
 
-$HTTPS =& url('https');
-$HTTPS_def =& config('https');
+/**
+ * Conectar Primera Base Datos
+ */
+sql_start();
 
-if ( ! is_null($HTTPS_def) and $HTTPS !== $HTTPS_def)
-{
-	$scheme =& url('scheme');
-	
-	$scheme = $HTTPS_def ? 'https' : 'http';
-	redirect(build_url(url('array')));
-}
-
-## Conectar la base de datos
-$db =& config('db');
-
-if ( ! is_empty($db))
-{
-	isset($db['host']) or $db['host'] = 'localhost';
-	isset($db['user']) or $db['user'] = 'root';
-	isset($db['pasw']) or $db['pasw'] = NULL;
-
-	cbd($db['host'], $db['user'], $db['pasw'], $db['name']);
-}
-
+/**
+ * Inicializar Router
+ */
 RTR()->init();
 
-action_apply('jcore_loaded');
+/**
+ * EJECUTANDO ACCIÓN PROGRAMADA `core_end`
+ * @see action_apply()
+ *
+ * @internal
+ */
+action_apply('core_end');
+
+/**
+ * Marcando el punto de proceso `core_end`
+ * @see mark()
+ *
+ * @internal
+ */
+mark('core_end');
+
 
 /**
  * Imagen Service Slug
  */
-$images_zones = (array)config('images_zones');
-foreach (array_reverse($images_zones) as $zone)
+check_image_slug ();
+
+/**
+ * INICIANDO EL APP
+ * El app permite cambiar configuraciones o agregar cambios antes de  procesar el REQUEST para emitir un RESPONSE.
+ * 
+ * @see APP.php
+ */
+
+if ( $file = APPPATH . DS . 'APP.php' and file_exists($file))
 {
-	if (preg_match('#'.regex($zone['uri']).'#i', url()) && RTR()->portal() === ucfirst($zone['slug']))
-	{
-		$mng = new ImageMng($zone);
-		$mng-> processUrl();
-		break;
-	}
+	require_once $file;
 }
+
+/**
+ * APP\run()
+ *
+ * Función que procesa el request y emite un response
+ */
+APP()->run();
