@@ -1,4 +1,4 @@
-# JCore V3.2
+# JCore
 
 Copyright (c) 2018 - 2023, JYS Perú
 
