@@ -1,0 +1,48 @@
+<!DOCTYPE html><html><head><meta charset="utf-8"><title>Markdown Plus exported HTML</title><link rel="stylesheet" href="https://cdn.rawgit.com/tylingsoft/markdown-core/0.7.0/dist/markdown-core.min.css"></head><body><article class="markdown-body"><h1 id="jcore"><a class="anchor" href="#jcore"><span class="octicon octicon-link"></span></a>JCore</h1>
+<p>Copyright (c) 2018 - 2023, JYS Perú</p>
+<p>Se otorga permiso, de forma gratuita, a cualquier persona que obtenga una copia de este software y archivos de documentación asociados (el "Software"), para tratar el Software sin restricciones, incluidos, entre otros, los derechos de uso, copia, modificación y fusión, publicar, distribuir, sublicenciar y / o vender copias del Software, y permitir a las personas a quienes se les proporciona el Software que lo hagan, sujeto a las siguientes condiciones:</p>
+<p>El aviso de copyright anterior y este aviso de permiso se incluirán en todas las copias o porciones sustanciales del software.</p>
+<p>EL SOFTWARE SE PROPORCIONA "TAL CUAL", SIN GARANTÍA DE NINGÚN TIPO, EXPRESA O IMPLÍCITA, INCLUIDAS, ENTRE OTRAS, LAS GARANTÍAS DE COMERCIABILIDAD, IDONEIDAD PARA UN PROPÓSITO PARTICULAR Y NO INFRACCIÓN.<br>
+EN NINGÚN CASO LOS AUTORES O PROPIETARIOS DE DERECHOS DE AUTOR SERÁN RESPONSABLES DE CUALQUIER RECLAMO, DAÑO O CUALQUIER OTRO TIPO DE RESPONSABILIDAD, YA SEA EN UNA ACCIÓN CONTRACTUAL, AGRAVIO U OTRO, DERIVADOS, FUERA DEL USO DEL SOFTWARE O EL USO U OTRAS DISPOSICIONES DEL SOFTWARE.</p>
+<blockquote>
+<p>@author		YisusCore<br>
+@link		<a href="https://jcore.jys.pe/jcore">https://jcore.jys.pe/jcore</a><br>
+@version		1.0.0<br>
+@copyright	Copyright (c) 2018 - 2023, JYS Perú (<a href="https://www.jys.pe/">https://www.jys.pe/</a>)<br></p>
+</blockquote>
+<h2 id="instalación"><a class="anchor" href="#instalación"><span class="octicon octicon-link"></span></a>Instalación</h2>
+<ol>
+<li>
+<p>Copiar el archivo ZIP <code>index.zip</code> en el directorio de la aplicación.</p>
+</li>
+<li>
+<p>En caso que el directorio de la aplicación sea diferente al directorio de acceso a la aplicación <strong>(LLEGADA DEL LINK)</strong>:</p>
+<p>2.1. Mover los archivos <code>index.php</code> y <code>.htaccess</code>
+2.2. Declarar la variable <code>SUBPATH</code> en el archivo <code>index.php</code> indicando el subdirectorio donde se encuentra el directorio de la aplicación</p>
+</li>
+<li>
+<p>En caso que el archivo <code>init.php</code> no se encuentre en el mismo directorio que <code>index.php</code>:</p>
+<p>3.1. Modificar la variable <code>$init_php</code> en el archivo <code>index.php</code> indicando la ruta donde se encuentra el archivo <code>init.php</code></p>
+</li>
+<li>
+<p>En caso que se desee validar los requerimientos de la versión actual del núcleo <code>JCore</code>:</p>
+<p>4.1. Modificar la variable <code>$server_validation</code> en el archivo <code>index.php</code> indicando <code>TRUE</code></p>
+</li>
+<li>
+<p>En caso que el ambiente de desarrollo no está en <code>desarrollo</code>:</p>
+<p>5.1. Declarar la variable <code>ENVIRONMENT</code> en el archivo <code>index.php</code> indicando el ambiente de desarrollo el cual se encuentre el aplicativo (<code>pruebas</code> ó <code>produccion</code>)</p>
+</li>
+<li>
+<p>En caso que el núcleo <code>JCore</code> no se encuentre en la subcarpeta <code>JCore</code> del directorio de la aplicación:</p>
+<p>6.1. Modificar la variable <code>$JCore_path</code> en el archivo <code>index.php</code> indicando la ruta al núcleo <code>JCore</code></p>
+</li>
+<li>
+<p>En caso que el desarrollo de la <code>APLICACIÓN</code> no se encuentre en la subcarpeta <code>APP</code> del directorio de la aplicación:</p>
+<p>6.1. Modificar la variable <code>$APP_path</code> en el archivo <code>index.php</code> indicando la ruta del desarrollo</p>
+</li>
+<li>
+<p>En caso que la <code>APLICACIÓN</code> cuente con múltiples directorios <code>BASES</code>:</p>
+<p>6.1. Modificar la variable <code>$BASES_path</code> en el archivo <code>index.php</code> indicando las rutas de los directorios <code>BASES</code> considerando que el núcleo priorizará sus busquedas de archivos necesarios comenzando del primer directorio al último en aquella variable.<br><small>Los directorios <code>$APP_path</code> y <code>$JCore_path</code> se agregan automáticamente y en ese órden.</small></p>
+</li>
+</ol>
+</article><script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.0/jquery.slim.min.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.2.2/Chart.bundle.min.js"></script><script>$(function() { $('canvas.chartjs').each(function() { new Chart($(this), JSON.parse($(this).text())); }); });</script></body></html>
