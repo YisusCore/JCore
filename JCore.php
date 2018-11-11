@@ -350,7 +350,6 @@ APP() -> init();
  */
 RTR()->init();
 
-
 /**
  * Imagen Service Slug
  */
@@ -362,7 +361,6 @@ check_image_slug ();
  * 
  * @see APP.php
  */
-
 if ( $file = APPPATH . DS . 'APP.php' and file_exists($file))
 {
 	require_once $file;
