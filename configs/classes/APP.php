@@ -122,10 +122,10 @@ class APP implements ArrayAccess
 		 * Obteniendo la clase RESPONSE
 		 */
 		$this->Response = RSP();
-//		$this->Response->APP = $this;
+		$this->Response->APP = $this;
 		
-//		$this->Router->Response = $this->Response;
-//		$this->Response->Router = $this->Router;
+		$this->Router->Response = $this->Response;
+		$this->Response->Router = $this->Router;
 
 		/**
 		 * Identificando los Métodos de Request autorizados

@@ -635,4 +635,25 @@ class Response
         class2('OutputBuffering', 'class')->flush();
         exit;
     }
+	
+	
+	/**
+	 * Retorna el nombre y la versión de la clase
+	 * @return string
+	 */
+	public function __toString()
+	{
+		return get_class() . ' v' . self::version . ' by JYS Perú';
+	}
+	
+	/**
+	 * Permite retornar datos de desarrollador
+	 * @return Array
+	 */
+	public function __debugInfo()
+	{
+		return [
+			'_' => $this->__toString(),
+		];
+	}
 }
