@@ -93,7 +93,7 @@ class BenchMark implements ArrayAccess, Iterator
 			return '';
 		}
 		
-		$first_time = $this->points[$second];
+		$first_time = $this->points[$first];
 		
 		if ( ! is_null($second) and ! isset($this->points[$second]))
 		{
