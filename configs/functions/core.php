@@ -516,19 +516,6 @@ if ( ! function_exists('APP'))
 	}
 }
 
-if ( ! function_exists('RSP'))
-{
-	/**
-	 * RSP()
-	 * Retorna la instancia del Reponse
-	 * @return	RSP
-	 */
-	function RSP()
-	{
-		return APP()->Response;
-	}
-}
-
 if ( ! function_exists('RTR'))
 {
 	/**
@@ -538,7 +525,33 @@ if ( ! function_exists('RTR'))
 	 */
 	function RTR()
 	{
-		return APP()->Router;
+		return Router::instance();
+	}
+}
+
+if ( ! function_exists('RSP'))
+{
+	/**
+	 * RSP()
+	 * Retorna la instancia del Reponse
+	 * @return	RSP
+	 */
+	function RSP()
+	{
+		return Response::instance();
+	}
+}
+
+if ( ! function_exists('OPB'))
+{
+	/**
+	 * OPB()
+	 * Retorna la instancia del OPB
+	 * @return	OutputBuffering
+	 */
+	function OPB()
+	{
+		return OutputBuffering::instance();
 	}
 }
 

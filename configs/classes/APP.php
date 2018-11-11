@@ -138,14 +138,19 @@ class APP implements ArrayAccess
 		$this->_timezone_updated();
 
 		/**
-		 * Obteniendo la clase RESPONSE
-		 */
-		$this->variables['Response'] =& class2('Response', 'class');
-
-		/**
 		 * Obteniendo la clase ROUTER
 		 */
-		$this->variables['Router'] =& class2('Router', 'class');
+		$this->Router = RTR();
+		$this->Router->APP = $this;
+
+		/**
+		 * Obteniendo la clase RESPONSE
+		 */
+		$this->Response = RSP();
+		$this->Response->APP = $this;
+		
+		$this->Router->Response = $this->Response;
+		$this->Response->Router = $this->Router;
 
 		/**
 		 * Identificando los Métodos de Request autorizados

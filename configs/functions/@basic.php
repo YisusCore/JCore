@@ -458,8 +458,11 @@ if ( ! function_exists('ip_address'))
 			{
 				$ip_address = '0.0.0.0';
 			}
-			
-			$datos['array'] =& $datos;
+		}
+		
+		if ($get === 'array')
+		{
+			return $datos;
 		}
 		
 		if ( ! isset($datos[$get]))
