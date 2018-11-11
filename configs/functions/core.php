@@ -616,8 +616,24 @@ if ( ! function_exists('logger'))
 			$meta['OPB_loadable'] = isset($OPB);
 		}
 		
+		try
+		{
+			$BMK = BenchMark::instance();
+		}
+		catch (\BasicException $e){}
+		catch (\Exception $e){}
+		catch (\TypeError $e){}
+		catch (\Error $e){}
+		finally
+		{
+			$meta['BMK_loadable'] = isset($BMK);
+		}
+		
 		isset($OPB) and
 		$meta['buffer'] = $OPB -> stop() -> getContents();
+
+		isset($BMK) and
+		$meta['BMKTime'] = $BMK -> between('total_execution_time_start');
 
 		if ($message instanceof BasicException)
 		{
