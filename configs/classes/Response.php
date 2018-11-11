@@ -133,13 +133,22 @@ class Response
 
 	protected function __construct()
 	{
-        $this->CONTENT= '';
+		$this->CONTENT= '';
 
-        if (isset($_GET['contentOnly']))
+        if (defined('FORCE_RSP_TYPE'))
+		{
+			$this->setType(FORCE_RSP_TYPE);
+		}
+		elseif (isset($_GET['contentOnly']))
 		{
 			$this->setType('CONTENT');
 		}
-		elseif ((isset($_SERVER['HTTP_X_REQUESTED_WITH']) and (mb_strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest' or mb_strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'androidapp')) or isset($_GET['json']))
+		elseif (
+			(
+				isset($_SERVER['HTTP_X_REQUESTED_WITH']) and 
+			 	(mb_strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest' or mb_strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'androidapp')
+			) or isset($_GET['json'])
+		)
 		{
 			$this->setType('JSON');
 		}
@@ -154,7 +163,7 @@ class Response
 		$this->_zlib_oc = (bool) ini_get('zlib.output_compression');
 		$this->_compress = $this->_zlib_oc === FALSE && extension_loaded('zlib');
 
-		class2('OutputBuffering', 'class');
+		OPB();
 
 		action_add('shutdown', [$this, 'response']);
 	}

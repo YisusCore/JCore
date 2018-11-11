@@ -29,6 +29,8 @@
  * @filesource
  */
 
+defined('EXECTIMESTART') or define('EXECTIMESTART', microtime(TRUE));
+
 /**
  * DIRECTORY_SEPARATOR
  *
@@ -307,14 +309,6 @@ set_exception_handler('_exception_handler');
 register_shutdown_function('_shutdown_handler');
 
 /**
- * Marcando el punto de proceso `total_execution_time_start`
- * @see mark()
- *
- * @internal
- */
-mark('total_execution_time_start');
-
-/**
  * LEYENDO LOS HOOKS (Acciones programadas)
  * Lee todas las acciones programadas
  *
@@ -329,45 +323,12 @@ foreach($BASES_path as $basedir)
 }
 
 /**
- * EJECUTANDO ACCIÓN PROGRAMADA `functions_loaded`
- * @see action_apply()
- *
- * @internal
- */
-action_apply('functions_loaded');
-
-/**
- * Inicializar el APP
- * Permite inicializar la clase APP y todo las configuraciones
- *
- * @internal
- */
-APP()->init();
-
-/**
- * EJECUTANDO ACCIÓN PROGRAMADA `core_start`
- * @see action_apply()
- *
- * @internal
- */
-action_apply('core_start');
-
-/**
- * Marcando el punto de proceso `core_start`
+ * Marcando el punto de proceso `functions_loaded`
  * @see mark()
  *
  * @internal
  */
-mark('core_start');
-
-/**
- * UTF8_ENABLED
- *
- * Variable que permite conocer si la codificación UTF8 está habilitado
- *
- * @global
- */
-define('UTF8_ENABLED', defined('PREG_BAD_UTF8_ERROR') && APP()->charset === 'UTF-8');
+mark('functions_loaded');
 
 /**
  * Prioridad de WWW y HTTPS
@@ -377,30 +338,17 @@ redirect_default_www ();
 redirect_default_protocol ();
 
 /**
- * Conectar Primera Base Datos
+ * Inicializar el APP
+ * Permite inicializar la clase APP y todo las configuraciones
+ *
+ * @internal
  */
-sql_start();
+APP() -> init();
 
 /**
  * Inicializar Router
  */
 RTR()->init();
-
-/**
- * EJECUTANDO ACCIÓN PROGRAMADA `core_end`
- * @see action_apply()
- *
- * @internal
- */
-action_apply('core_end');
-
-/**
- * Marcando el punto de proceso `core_end`
- * @see mark()
- *
- * @internal
- */
-mark('core_end');
 
 
 /**

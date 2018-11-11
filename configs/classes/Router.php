@@ -206,16 +206,6 @@ class Router
 		is_array($this->_uri_rewrite_rules) or $this->_uri_rewrite_rules = [];
 		isset($this->_uri_rewrite_rules[$this->http_verb]) or $this->_uri_rewrite_rules[$this->http_verb] = [];
 		isset($this->_uri_rewrite_rules['ALL']) or $this->_uri_rewrite_rules['ALL'] = [];
-		
-		/**
-		 * Instancia de APP
-		 */
-		$this->APP = APP();
-		
-		/**
-		 * Obteniendo la clase RESPONSE
-		 */
-		$this->Response = RSP();
 	}
 
 	public function init()
@@ -232,6 +222,12 @@ class Router
 		
 		$_inited = TRUE;
 
+		isset($this->Response) or $this->Response = RSP();
+		
+		$http_verb = APP()->Router->http_verb();
+		$responseType = APP()->Response->responseType();
+		
+		
 		/**
 		 * Recorrer funciones preparatorias
 		 */

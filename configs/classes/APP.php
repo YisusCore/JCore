@@ -81,24 +81,11 @@ class APP implements ArrayAccess
 	 */
 	protected $variables = [];
 
-	/**
-	 * Inicializador de la clase
-	 * @global
-	 */
+	//=====================================================
+	// Constructor de la Clase
+	//=====================================================
 	public function init()
 	{
-		/**
-		 * Variable para saber si la clase ya ha sido inicializada
-		 */
-		static $_inited = FALSE;
-		
-		if ($_inited)
-		{
-			return $this;
-		}
-		
-		$_inited = TRUE;
-
 		/**
 		 * Obteniendo la codificación de caracteres
 		 */
@@ -106,10 +93,24 @@ class APP implements ArrayAccess
 		$this->_charset_updated();
 
 		/**
+		 * UTF8_ENABLED
+		 *
+		 * Variable que permite conocer si la codificación UTF8 está habilitado
+		 *
+		 * @global
+		 */
+		define('UTF8_ENABLED', defined('PREG_BAD_UTF8_ERROR') && APP()->charset === 'UTF-8');
+		
+		/**
 		 * Obteniendo la zona horaria
 		 */
 		$this->variables['timezone'] =& config('timezone');
 		$this->_timezone_updated();
+
+		/**
+		 * Conectar Primera Base Datos
+		 */
+		sql_start();
 
 		/**
 		 * Obteniendo la clase ROUTER
@@ -121,10 +122,10 @@ class APP implements ArrayAccess
 		 * Obteniendo la clase RESPONSE
 		 */
 		$this->Response = RSP();
-		$this->Response->APP = $this;
+//		$this->Response->APP = $this;
 		
-		$this->Router->Response = $this->Response;
-		$this->Response->Router = $this->Router;
+//		$this->Router->Response = $this->Response;
+//		$this->Response->Router = $this->Router;
 
 		/**
 		 * Identificando los Métodos de Request autorizados

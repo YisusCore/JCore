@@ -278,7 +278,7 @@ if ( ! function_exists('action_apply'))
 	 * @param	mixed	&...$params	Parametros a enviar en las funciones del Hook (Referenced)
 	 * @return bool
 	 */
-	function action_apply ($key, &...$params)
+	function action_apply ($key, ...$params)
 	{
 		global $JC_actions;
 		$lista =& $JC_actions;
@@ -560,7 +560,7 @@ if ( ! function_exists('logger'))
 		is_array($meta) or $meta = (array)$meta;
 		
 		$meta['time'] = time();
-		$meta['datetime'] = function_exists('date2') ? date2() : date('Y-m-d H:i:s');
+		$meta['datetime'] = function_exists('date2') ? date2('LL') : date('Y-m-d H:i:s');
 		$meta['microtime'] = microtime();
 		$meta['microtime_float'] = microtime(true);
 		
@@ -3425,7 +3425,12 @@ if ( ! function_exists('_error_handler'))
 			return;
 		}
 
-		logger($message, $severity, $severity, [], $filepath, $line);
+		logger($message, 
+			   $severity, 
+			   $severity, 
+			   [], 
+			   $filepath, 
+			   $line);
 
 		if ($is_error)
 		{

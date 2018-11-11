@@ -46,16 +46,13 @@ class BenchMark implements ArrayAccess, Iterator
 	//-------------------------------------------
 	// Statics
 	//-------------------------------------------
-	static $instance;
-	
 	static function &instance()
 	{
-		if ( ! isset(self::$instance))
-		{
-			self::$instance = new self();
-		}
+		static $instance;
 		
-		return self::$instance;
+		isset($instance) or $instance = new self();
+		
+		return $instance;
 	}
 	
 	//-------------------------------------------
@@ -70,6 +67,9 @@ class BenchMark implements ArrayAccess, Iterator
 	protected function __construct()
 	{
 		$this->position = 0;
+		
+		defined('EXECTIMESTART') and
+		$this->points['total_execution_time_start'] = EXECTIMESTART;
 	}
 	
 	//-------------------------------------------
@@ -78,6 +78,7 @@ class BenchMark implements ArrayAccess, Iterator
 	public function mark ($key)
 	{
 		$this->points[$key] = microtime(TRUE);
+		action_apply($key, microtime(TRUE));
 	}
 	
 	public function between ($first = NULL, $second = NULL, $decimals = 4)
