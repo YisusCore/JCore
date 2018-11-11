@@ -953,7 +953,7 @@ if ( ! function_exists('js_compressor'))
 		}
 		catch (BasicException $e)
 		{
-			APP()->log($e, FALSE);
+			logger($e, FALSE);
 		}
 		catch (Exception $e)
 		{}
@@ -1032,7 +1032,7 @@ if ( ! function_exists('css_compressor'))
 		}
 		catch (BasicException $e)
 		{
-			APP()->log($e, FALSE);
+			logger($e, FALSE);
 		}
 		catch (Exception $e)
 		{}

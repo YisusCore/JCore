@@ -289,9 +289,9 @@ if ( ! function_exists('print_array'))
 	 */
 	function print_array(...$array)
 	{
-		if ( ! display_errors() and ! is_localhost() and function_exists('APP'))
+		if ( ! display_errors() and ! is_localhost() and function_exists('logger'))
 		{
-			APP()->log('Está mostrando información de Desarrollador con la opción `display_errors` desactivada', FALSE);
+			logger('Está mostrando información de Desarrollador con la opción `display_errors` desactivada', FALSE);
 		}
 		
 		$r = '';

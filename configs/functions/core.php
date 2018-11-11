@@ -503,6 +503,310 @@ if ( ! function_exists('getUTC'))
 // JCore
 //=========================================================
 
+if ( ! function_exists('logger'))
+{
+	/**
+	 * logger()
+	 * Función que guarda los logs
+	 *
+	 * @param BasicException|Exception|TypeError|Error|string 	$message	El mensaje reportado
+	 * @param int|null 		$code		(Optional) El código del error
+	 * @param string|null	$severity	(Optional) La severidad del error
+	 * @param array|null 	$meta		(Optional) Los metas del error
+	 * @param string|null 	$filepath	(Optional) El archivo donde se produjo el error
+	 * @param int|null 		$line		(Optional) La linea del archivo donde se produjo el error
+	 * @param array|null 	$trace		(Optional) La ruta que tomó la ejecución hasta llegar al error
+	 * @return void
+	 */
+	function logger ($message, $code = NULL, $severity = NULL, $meta = NULL, $filepath = NULL, $line = NULL, $trace = NULL, $show = TRUE)
+	{
+		/**
+		 * Listado de Levels de Errores
+		 * @static
+		 * @global
+		 */
+		static $error_levels = 
+		[
+			E_ERROR			    =>	'Error',				
+			E_WARNING		    =>	'Warning',				
+			E_PARSE			    =>	'Parsing Error',		
+			E_NOTICE		    =>	'Notice',				
+
+			E_CORE_ERROR		=>	'Core Error',		
+			E_CORE_WARNING		=>	'Core Warning',		
+
+			E_COMPILE_ERROR		=>	'Compile Error',	
+			E_COMPILE_WARNING	=>	'Compile Warning',	
+
+			E_USER_ERROR		=>	'User Error',		
+			E_USER_DEPRECATED	=>	'User Deprecated',	
+			E_USER_WARNING		=>	'User Warning',		
+			E_USER_NOTICE		=>	'User Notice',		
+
+			E_STRICT		    =>	'Runtime Notice'		
+		];
+		
+		static $saving = FALSE;
+
+		$config = config('log');
+		
+		is_bool($code) and $show = $code and $code = NULL;
+		
+		(is_array($severity) and is_null($meta)) and $meta = $severity and $severity = NULL;
+		
+		is_null($code) and $code = 0;
+		
+		is_null($meta) and $meta = [];
+		is_array($meta) or $meta = (array)$meta;
+		
+		$meta['time'] = time();
+		$meta['datetime'] = function_exists('date2') ? date2() : date('Y-m-d H:i:s');
+		$meta['microtime'] = microtime();
+		$meta['microtime_float'] = microtime(true);
+		
+		try
+		{
+			$APP = APP();
+		}
+		catch (\BasicException $e){}
+		catch (\Exception $e){}
+		catch (\TypeError $e){}
+		catch (\Error $e){}
+		finally
+		{
+			$meta['APP_loadable'] = isset($APP);
+		}
+		
+		try
+		{
+			$RSP = RSP();
+		}
+		catch (\BasicException $e){}
+		catch (\Exception $e){}
+		catch (\TypeError $e){}
+		catch (\Error $e){}
+		finally
+		{
+			$meta['RSP_loadable'] = isset($RSP);
+		}
+				
+		try
+		{
+			$RTR = RTR();
+		}
+		catch (\BasicException $e){}
+		catch (\Exception $e){}
+		catch (\TypeError $e){}
+		catch (\Error $e){}
+		finally
+		{
+			$meta['RTR_loadable'] = isset($RTR);
+		}
+		
+		try
+		{
+			$OPB = OPB();
+		}
+		catch (\BasicException $e){}
+		catch (\Exception $e){}
+		catch (\TypeError $e){}
+		catch (\Error $e){}
+		finally
+		{
+			$meta['OPB_loadable'] = isset($OPB);
+		}
+		
+		isset($OPB) and
+		$meta['buffer'] = $OPB -> stop() -> getContents();
+
+		if ($message instanceof BasicException)
+		{
+			$exception = $message;
+			
+			$meta = array_merge($exception->getMeta(), $meta);
+			is_null($severity) and $severity = 'BasicException';
+			$meta['class'] = get_class($exception);
+		}
+		elseif ($message instanceof Exception)
+		{
+			$exception = $message;
+			
+			is_null($severity) and $severity = 'Exception';
+			$meta['class'] = get_class($exception);
+		}
+		elseif ($message instanceof TypeError)
+		{
+			$exception = $message;
+			
+			is_null($severity) and $severity = 'Error';
+			$meta['class'] = get_class($exception);
+		}
+		elseif ($message instanceof Error)
+		{
+			$exception = $message;
+			
+			is_null($severity) and $severity = 'Error';
+			$meta['class'] = get_class($exception);
+		}
+		
+		if (isset($exception))
+		{
+			$message  = $exception->getMessage();
+			
+			is_null($filepath) and $filepath = $exception->getFile();
+			is_null($line)     and $line     = $exception->getLine();
+			is_null($trace)    and $trace    = $exception->getTrace();
+			$code == 0         and $code     = $exception->getCode();
+		}
+
+		is_null($severity) and $severity = E_USER_NOTICE;
+		
+		$severity = isset($error_levels[$severity]) ? $error_levels[$severity] : $severity;
+		
+		is_null($message) and $message = '[NULL]';
+		
+		// Detectar la ruta del error
+		if (is_null($trace))
+		{
+			$trace = debug_backtrace(false);
+			
+			if ($trace[0]['function'] === __FUNCTION__ and isset($trace[0]['class']) and $trace[0]['class'] === __CLASS__)
+			{
+				array_shift($trace);
+			}
+			
+			if (in_array($trace[0]['function'], ['_exception_handler', '_error_handler']))
+			{
+				array_shift($trace);
+			}
+		}
+		
+		if (isset($trace[0]))
+		{
+			is_null($filepath) and $filepath = $trace[0]['file'];
+			is_null($line) and $line = $trace[0]['line'];
+
+			isset($trace[0]['class']) and ! isset($meta['class']) and $meta['class'] = $trace[0]['class'];
+			isset($trace[0]['function']) and ! isset($meta['function']) and $meta['function'] = $trace[0]['function'];
+		}
+		
+		$SER = [];
+		foreach($_SERVER as $x => $y)
+		{
+			if (preg_match('/^((GATEWAY|HTTP|QUERY|REMOTE|REQUEST|SCRIPT|CONTENT)\_|REDIRECT_URL|REDIRECT_STATUS|PHP_SELF|SERVER\_(ADDR|NAME|PORT|PROTOCOL))/i', $x))
+			{
+				$SER[$x] = $y;
+			}
+		}
+		
+		$meta['server'] = $SER;
+		$meta['disp'] = defined('disp') ? disp : NULL;
+		$meta['stat'] = isset($_SESSION['stat']) ? $_SESSION['stat'] : NULL;
+		
+		try
+		{
+			$url = url('array');
+		}
+		catch (\BasicException $e){}
+		catch (\Exception $e){}
+		catch (\TypeError $e){}
+		catch (\Error $e){}
+		finally
+		{
+			$meta['URL_loadable'] = isset($url);
+		}
+		
+		isset($url) and
+		$meta['url'] = $url;
+		
+		try
+		{
+			$ip_address = ip_address('array');
+		}
+		catch (\BasicException $e){}
+		catch (\Exception $e){}
+		catch (\TypeError $e){}
+		catch (\Error $e){}
+		finally
+		{
+			$meta['IPADRESS_loadable'] = isset($url);
+		}
+		
+		isset($ip_address) and
+		$meta['ip_address'] = $ip_address;
+		
+		$saving and $error_while_saving = TRUE; // Se produjo un error mientras
+		
+		if ( ! isset($error_while_saving))
+		{
+			
+		$saving = TRUE;
+		$saved = FALSE;
+		
+		$saved = filter_apply('save_logs', $saved, $message, $severity, $code, $filepath, $line, $trace, $meta);
+		
+		// Guardar Log en Archivo
+		// almacena los logs en un archivo, solo agrega lineas
+		// PRIORIDAD II
+		if ( ! $saved)
+		{
+			mkdir2($config['path']);
+
+			$log_file = $config['path'] . DS . 'log-' . date('Y-m') . '.' . $config['file_ext'];
+			$msg_file = '';
+
+			if ( ! file_exists($log_file))
+			{
+				$newfile = TRUE;
+
+				if ($config['file_ext'] === 'php')
+				{
+					$msg_file .= "<?php exit('No direct script access allowed'); ?>\n\n";
+				}
+			}
+
+			$msg_file .= $config['format_line']($message, $severity, $code, $filepath, $line, $trace, $meta);
+
+			$result = file_put_contents($log_file, $msg_file, FILE_APPEND | LOCK_EX);
+
+			if (isset($newfile) && $newfile === TRUE)
+			{
+				chmod($log_file, $config['file_permissions']);
+			}
+			
+			$saved = is_int($result);
+		}
+		
+		}
+		## Mostrar Log en Web
+		if ((display_errors() and $show) or isset($error_while_saving))
+		{
+			if ( ! is_cli())
+			{
+				$message = protect_server_dirs($message);
+				$filepath = protect_server_dirs($filepath);
+				foreach ($trace as &$error)
+				{
+					isset($error['file']) or $error['file'] = '[NO FILE]';
+					isset($error['line']) or $error['line'] = '[NO LINE]';
+					
+					$error['file'] = protect_server_dirs($error['file']);
+				}
+				unset($error);
+			}
+
+			if ($severity === 'Exception')
+			{
+				include @template('errors' . DS . 'exception.php', FALSE);
+			}
+			else
+			{
+				include @template('errors' . DS . 'php-error.php', FALSE);
+			}
+		}
+	}
+}
+
 if ( ! function_exists('APP'))
 {
 	/**
@@ -697,7 +1001,7 @@ if ( ! function_exists('_t'))
 				isset($file) or $file = __FILE__;
 				isset($line) or $line = __LINE__;
 				
-				API()->log('Frase sin traducción - '.$lang.' ('.$frase.')', E_USER_WARNING, 'Translate', [], $file, $line, $bcktrc, false);
+				logger('Frase sin traducción - '.$lang.' ('.$frase.')', E_USER_WARNING, 'Translate', [], $file, $line, $bcktrc, false);
 			}
 			
 			return $_sprintf($frase, $sprintf);
@@ -3121,7 +3425,7 @@ if ( ! function_exists('_error_handler'))
 			return;
 		}
 
-		APP()->log($message, $severity, $severity, [], $filepath, $line);
+		logger($message, $severity, $severity, [], $filepath, $line);
 
 		if ($is_error)
 		{
@@ -3141,7 +3445,7 @@ if ( ! function_exists('_exception_handler'))
 	 */
 	function _exception_handler($exception)
 	{
-		APP()->log($exception);
+		logger($exception);
 		
 		is_cli() OR set_status_header(500);
 		exit(1);

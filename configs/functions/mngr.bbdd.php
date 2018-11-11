@@ -149,28 +149,28 @@ if ( ! function_exists('cbd'))
 		
 		if ( ! is_empty($base_datos) and ! mysqli_select_db($conection, $base_datos))
 		{
-			APP()->log(mysqli_error($conection), mysqli_errno($conection), 'BBDD: SELECT DB');
+			logger(mysqli_error($conection), mysqli_errno($conection), 'BBDD: SELECT DB');
 		}
 		
 		$conection->_base_datos = $base_datos;
 
 		if ( ! mysqli_set_charset($conection, $charset))
 		{
-			APP()->log(mysqli_error($conection), mysqli_errno($conection), 'BBDD: SET charset');
+			logger(mysqli_error($conection), mysqli_errno($conection), 'BBDD: SET charset');
 		}
 		
 		$conection->_charset = $charset;
 
 		if ( ! mysqli_query($conection, 'SET time_zone = "' . getUTC() . '";'))
 		{
-			APP()->log(mysqli_error($conection), mysqli_errno($conection), 'BBDD: SET time_zone');
+			logger(mysqli_error($conection), mysqli_errno($conection), 'BBDD: SET time_zone');
 		}
 		
 		$conection->_utc = getUTC();
 
 		if ( ! mysqli_query($conection, 'SET SESSION group_concat_max_len = 1000000;'))
 		{
-			APP()->log(mysqli_error($conection), mysqli_errno($conection), 'BBDD: SET group_concat_max_len');
+			logger(mysqli_error($conection), mysqli_errno($conection), 'BBDD: SET group_concat_max_len');
 		}
 
 		return $conection;
@@ -310,7 +310,7 @@ if ( ! function_exists('sql'))
 			$MYSQL_ERROR = mysqli_error($conection);
 			$MYSQL_ERRNO = mysqli_errno($conection);
 			
-			APP()->log($MYSQL_ERROR, $MYSQL_ERRNO, 'BBDD: SQL Excecuted', ['query' => $query]);
+			logger($MYSQL_ERROR, $MYSQL_ERRNO, 'BBDD: SQL Excecuted', ['query' => $query]);
 			return FALSE;
 		}
 		
@@ -374,7 +374,7 @@ if ( ! function_exists('sql_data'))
 			$MYSQL_ERROR = mysqli_error($conection);
 			$MYSQL_ERRNO = mysqli_errno($conection);
 			
-			APP()->log($MYSQL_ERROR, $MYSQL_ERRNO, 'BBDD: SQL Excecuted', ['query' => $query]);
+			logger($MYSQL_ERROR, $MYSQL_ERRNO, 'BBDD: SQL Excecuted', ['query' => $query]);
 			
 			$sql_data_result = sql_data::fromArray([])
 				-> quitar_fields('log');
