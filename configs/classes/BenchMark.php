@@ -93,14 +93,25 @@ class BenchMark implements ArrayAccess, Iterator
 			return '';
 		}
 		
-		if ( ! isset($this->points[$second]))
+		$first_time = $this->points[$second];
+		
+		if ( ! is_null($second) and ! isset($this->points[$second]))
 		{
 			$this->points[$second] = microtime(TRUE);
+			$second_time = $this->points[$second];
+		}
+		elseif ( ! is_null($second))
+		{
+			$second_time = $this->points[$second];
+		}
+		else
+		{
+			$second_time = microtime(TRUE);
 		}
 		
-		return number_format($this->points[$second] - $this->points[$first], $decimals);
+		return number_format($first_time - $second_time, $decimals);
 	}
-	
+
 	//-------------------------------------------
 	// Array Access
 	//-------------------------------------------
@@ -108,22 +119,22 @@ class BenchMark implements ArrayAccess, Iterator
 	{
 		return isset($this->points[$offset]);
 	}
-	
+
 	public function offsetGet ($offset)
 	{
 		return $this->points[$offset];
 	}
-	
+
 	public function offsetSet ($offset, $value)
 	{
 		$this->points[$offset] = $value;
 	}
-	
+
 	public function offsetUnset ($offset)
 	{
 		unset ($this->points[$offset]);
 	}
-	
+
 	//-------------------------------------------
 	// Iterator
 	//-------------------------------------------
