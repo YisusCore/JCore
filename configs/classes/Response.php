@@ -215,6 +215,25 @@ class Response
 		return $this;
 	}
 	
+	public function download($filename = '')
+	{
+		if (@is_file($filename) AND ($filesize = @filesize($filename)) !== FALSE)
+		{
+			$this -> setContent(@file_get_contents($filename));
+			$filename = basename($filename);
+		}
+		
+		$filesize = mb_strlen($this->CONTENT);
+		
+		header('Content-Disposition: attachment; filename="'.$filename.'"');
+		header('Expires: 0');
+		header('Content-Transfer-Encoding: binary');
+		header('Content-Length: '.$filesize);
+		header('Cache-Control: private, no-transform, no-store, must-revalidate');
+		
+		return $this;
+	}
+	
     public function setType($type, $mime = NULL, $charset = NULL)
     {
 		$type = mb_strtoupper($type);
@@ -370,6 +389,20 @@ class Response
         return $this->_responseType;
     }
 	
+    /**
+     * set CONTENT to the response
+     *
+     * @param string $content A string to be appended to
+     *                        the current output buffer
+     *
+     * @return void
+     */
+    public function setContent($content)
+    {
+        $this->CONTENT = $content;
+		return $this;
+    }
+
     /**
      * Add HTML code to the response
      *
@@ -556,6 +589,16 @@ class Response
 	public function redirect_ifhtml($link)
 	{
 		return $this->redirect_iftype('HTML', $link);
+	}
+
+	/**
+	 * Establecer una redirección en caso el Tipo sea
+	 * @param	string	$link
+	 * @return	self
+	 */
+	public function redirect($link)
+	{
+		return $this->redirect_iftype($this->_responseType, $link);
 	}
 
 	/**
