@@ -681,6 +681,11 @@ if ( ! function_exists('logger'))
 		
 		is_null($message) and $message = '[NULL]';
 		
+		if ($message === 'Only variable references should be returned by reference' and $code === E_NOTICE)
+		{
+			return;
+		}
+		
 		// Detectar la ruta del error
 		if (is_null($trace))
 		{
@@ -1555,7 +1560,7 @@ if ( ! function_exists('class2'))
 	 * @param mixed $param Parametros a enviar al constructor de la clase
 	 * @return string
 	 */
-	function class2($class, $dir = NULL, $ver = NULL, $param = NULL)
+	function class2($class, $dir = NULL, $ver = NULL, $param = NULL, $param2 = NULL, $param3 = NULL, $param4 = NULL, $param5 = NULL)
 	{
 		static $_founds = [];
 		
@@ -1860,17 +1865,17 @@ if ( ! function_exists('class2'))
 
 		if ($function = [$_class, 'instance'] and is_callable($function))
 		{
-			return call_user_func($function, $param);
+			return call_user_func($function, $param, $param2, $param3, $param4, $param5);
 		}
 		
 		if ($function = [$_class, 'getInstance'] and is_callable($function))
 		{
-			return call_user_func($function, $param);
+			return call_user_func($function, $param, $param2, $param3, $param4, $param5);
 		}
 
 		try
 		{
-			$obj = (new $_class($param));
+			$obj = (new $_class($param, $param2, $param3, $param4, $param5));
 			return $obj;
 		}
 		catch(\Error $e)
