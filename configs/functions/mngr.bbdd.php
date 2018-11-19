@@ -149,7 +149,7 @@ if ( ! function_exists('cbd'))
 		
 		if ( ! is_empty($base_datos) and ! mysqli_select_db($conection, $base_datos))
 		{
-			logger(mysqli_error($conection), mysqli_errno($conection), 'BBDD: SELECT DB');
+			throw new BasicException(mysqli_error($conection), mysqli_errno($conection));
 		}
 		
 		$conection->_base_datos = $base_datos;
