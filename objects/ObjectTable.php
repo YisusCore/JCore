@@ -21,11 +21,6 @@ class ObjectTable extends ArrayObject
     protected static $tblname_singular;
 
     /**
-     * @static @var $tblname_singular2
-     */
-    protected static $tblname_singular2;
-
-    /**
      * @static @var $tblname_plural
      */
     protected static $tblname_plural;
@@ -97,9 +92,6 @@ class ObjectTable extends ArrayObject
         {
             case 'singular':
                 return self::$tblname_singular;
-                break;
-            case 'singular2':
-                return self::$tblname_singular2;
                 break;
             case 'plural':
                 return self::$tblname_plural;
@@ -232,7 +224,7 @@ class ObjectTable extends ArrayObject
 					$_where .= ' IN (' . implode(', ', array_map('qp_esc', $val)) . ')';
 				}
 			}
-			elseif (is_null($val) and $field_dats['Null'] !== 'NO')
+			elseif (is_null($val) and $field_dats['Null'])
 			{
 				$_where .= ' IS NULL';
 			}
@@ -331,7 +323,7 @@ class ObjectTable extends ArrayObject
 		{
 			$field_dats = $columns[$key];
 			
-			if (is_null($this->_data[$key]) and $field_dats['Null'] !== 'NO')
+			if (is_null($this->_data[$key]) and $field_dats['Null'])
 			{
 				$_where .= ' AND `'.$key.'` IS NULL';
 				continue;
@@ -433,7 +425,7 @@ class ObjectTable extends ArrayObject
 				{
 					return qp_esc($data[$index]);
 				}
-				elseif ($index_dats['Null'] === 'NO' or $index_dats['Extra'] === 'auto_increment')
+				elseif ( ! $index_dats['Null'] or $index_dats['Extra'] === 'auto_increment')
 				{
 					return qp_esc($data[$index], 'DEFAULT');
 				}
@@ -524,7 +516,7 @@ class ObjectTable extends ArrayObject
 				{
 					return $campo . qp_esc($data[$field]);
 				}
-				elseif ($field_dats['Null'] === 'NO')
+				elseif ( ! $field_dats['Null'])
 				{
 					return $campo . qp_esc($data[$field], 'DEFAULT');
 				}
@@ -546,7 +538,7 @@ class ObjectTable extends ArrayObject
 				{
 					return $campo . qp_esc($data[$field]);
 				}
-				elseif ($field_dats['Null'] === 'NO')
+				elseif ( ! $field_dats['Null'])
 				{
 					return $campo . qp_esc($data[$field], 'DEFAULT');
 				}
@@ -598,7 +590,7 @@ class ObjectTable extends ArrayObject
 				{
 					return $campo . qp_esc($data[$field]);
 				}
-				elseif ($field_dats['Null'] === 'NO')
+				elseif ( ! $field_dats['Null'])
 				{
 					return $campo . qp_esc($data[$field], 'DEFAULT');
 				}
@@ -673,7 +665,7 @@ class ObjectTable extends ArrayObject
 				$CLASS = $ref['REFERENCED_TABLE_CLASS'];
 			}
 		}
-		
+
 		if ( is_null($CLASS))
 		{
 			return NULL;
@@ -782,28 +774,32 @@ class ObjectTable extends ArrayObject
         $last_refs_tbls = [];
         foreach($key_column_usage as $tbl)
         {
+			
         	$TABLE_NAME = $tbl['TABLE_NAME'];
         	$COLUMN_NAME = $tbl['COLUMN_NAME'];
         	$REFERENCED_COLUMN_NAME = $tbl['REFERENCED_COLUMN_NAME'];
 			
-        	$attr = preg_replace('/^' . $this::$tblname_singular2 . '(e)?(s)?\_/', '', $TABLE_NAME);
-
-//        	if (in_array($attr, $columns))
-        	{
+			if ( ! isset($tbl['TABLE_AS_ATTR']) or is_empty($tbl['TABLE_AS_ATTR']))
+			{
+				$attr = preg_replace('/^' . $this::$tblname . '(e)?(s)?\_/', '', $TABLE_NAME);
         		$attr .= '_lista';
-        	}
-        	
-        	$n = '';
-        	while(in_array($attr . $n, $last_refs_tbls))
-        	{
-        		$n === '' and $n = 0;
-        		$n++;
-        	}
-			
-        	$attr .= $n;
-        	$last_refs_tbls[] = $attr;
+				
+				$n = '';
+				while(in_array($attr . $n, $last_refs_tbls))
+				{
+					$n === '' and $n = 0;
+					$n++;
+				}
 
-        	$index = $attr;
+				$attr .= $n;
+				$last_refs_tbls[] = $attr;
+			}
+			else
+			{
+				$attr = $tbl['TABLE_AS_ATTR'];
+			}
+
+			$index = $attr;
         	
         	if (isset($this->_data[$index]) and ! is_empty($this->_data[$index]))
         	{
@@ -917,7 +913,7 @@ class ObjectTable extends ArrayObject
     /**
      * __get ()
      */
-    public function __get ($index)
+    public function &__get ($index)
     {
         $hiddens = $this::$hiddens;
 
@@ -946,10 +942,10 @@ class ObjectTable extends ArrayObject
        
 		$field = $this->_data[$index];
 		
-       if (is_callable($field))
-	   {
-		   return $field();
-	   }
+//       if (is_callable($field))
+//	   {
+//		   return $field();
+//	   }
 
 		if (is_array($field) and isset($field['exec']) and is_callable([$this, '_' . $field['exec']]))
 	   {
@@ -1070,10 +1066,18 @@ class ObjectTable extends ArrayObject
 
 		$field = $this->_data[$index];
 		
-       if (is_callable($field))
-	   {
-		   return $field();
-	   }
+//       if (is_callable($field) and ! in_array(mb_strtolower($field), ['date', 'mes']))
+//	   {
+//		   try
+//		   {
+//			   $field = $field();
+//			   return $field;
+//		   }
+//		   catch (\Exception $e)
+//		   {
+//			   return $field;
+//		   }
+//	   }
 
 		if (is_array($field) and isset($field['exec']) and is_callable([$this, '_' . $field['exec']]))
 	   {
