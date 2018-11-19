@@ -161,7 +161,8 @@ isset($vertical) or $vertical = FALSE;
 </div>
 
 <script>
-;(function($){
+Using('jQuery')
+.do(function($){
 	var modal;
 	
 	$('#<?= $id; ?>').on('click', '[data-modal]', function(){
@@ -182,4 +183,5 @@ isset($vertical) or $vertical = FALSE;
 		modal.find('.modal-body').html($(this).data('modal'));
 		modal.modal('show');
 	});
-}(jQuery))</script>
+});
+</script>
