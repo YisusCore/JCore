@@ -149,6 +149,13 @@ switch (ENVIRONMENT)
 }
 
 /**
+ * APP_NAMESPACE
+ *
+ * 
+ */
+defined('APP_NAMESPACE') or define('APP_NAMESPACE', 'JCore App')
+
+/**
  * VARIABLE JCore
  *
  * Variable global que permite almacenar valores y datos de manera global 

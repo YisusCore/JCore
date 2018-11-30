@@ -53,6 +53,7 @@ ABSPATH | DIRECTORIO ABSOLUTO DEL SITIO | Carpeta donde se encuentra alojado el 
 ROOTPATH | NÚCLEO JCORE | Ruta a la carpeta del núcleo JCore
 APPPATH | PROCESOS DE APLICACIÓN | Ruta a la carpeta que contiene las funciones, configuraciones, objetos, procesadores y pantallas
 ENVIRONMENT | AMBIENTE DE DESARROLLO | **Posibles valores:** <br>- desarrollo<br>- pruebas<br>- produccion
+APP_NAMESPACE | NOMINACIÓN DE ENTORNO | Un identificador sencillo de la aplicación que utiliza el núcleo JCore
 $BASES_path | DIRECTORIOS BASES | Array de los directorios base que buscará las estructuras de archivos<br>Se autoagregan los directorios `$APP_path` y `$JCore_path`
 
 
