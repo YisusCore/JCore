@@ -322,7 +322,7 @@ register_shutdown_function('_shutdown_handler');
  *
  * @internal
  */
-foreach($BASES_path as $basedir)
+foreach(array_reverse($BASES_path) as $basedir)
 {
 	if ($file = $basedir. DS. 'configs'. DS. 'hooks.php' and file_exists($file))
 	{
