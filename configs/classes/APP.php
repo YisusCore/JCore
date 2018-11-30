@@ -111,6 +111,17 @@ class APP implements ArrayAccess
 		 * Conectar Primera Base Datos
 		 */
 		sql_start();
+		
+		/**
+		 * Leer la instalación de la base datos
+		 */
+		foreach(array_reverse($BASES_path) as $basedir)
+		{
+			if ($file = $basedir. DS. 'configs'. DS. 'install.bbdd'. DS. 'require.php' and file_exists($file))
+			{
+				require_once $file;
+			}
+		}
 
 		/**
 		 * Obteniendo la clase ROUTER
