@@ -151,9 +151,9 @@ switch (ENVIRONMENT)
 /**
  * APP_NAMESPACE
  *
- * 
+ * Un identificador sencillo de la aplicación que utiliza el núcleo JCore
  */
-defined('APP_NAMESPACE') or define('APP_NAMESPACE', 'JCore App')
+defined('APP_NAMESPACE') or define('APP_NAMESPACE', 'JCore App');
 
 /**
  * VARIABLE JCore
