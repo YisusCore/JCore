@@ -115,6 +115,7 @@ class APP implements ArrayAccess
 		/**
 		 * Leer la instalación de la base datos
 		 */
+		global $BASES_path;
 		foreach(array_reverse($BASES_path) as $basedir)
 		{
 			if ($file = $basedir. DS. 'configs'. DS. 'install.bbdd'. DS. 'require.php' and file_exists($file))
