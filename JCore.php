@@ -176,7 +176,7 @@ $JC =& $JCore;
  */
 isset($BASES_path) or $BASES_path = [];
 
-in_array(APPPATH, $BASES_path) or $BASES_path[] = APPPATH;
+in_array(APPPATH, $BASES_path) or array_unshift($BASES_path, APPPATH);
 in_array(ROOTPATH, $BASES_path) or $BASES_path[] = ROOTPATH;
 
 /** Verificando las carpetas base */
