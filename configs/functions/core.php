@@ -3072,7 +3072,7 @@ if ( ! function_exists('get_file'))
 				unlink($the_file_path);
 			}
 		}
-		elseif ($abspath = '/home/jyspe/files' and file_exists($abspath) and $_tfp = $abspath . str_replace('/', DS, $the_file) and file_exists($_tfp))
+		elseif ($abspath = '/home/jyspe/public_html/files' and file_exists($abspath) and $_tfp = $abspath . str_replace('/', DS, $the_file) and file_exists($_tfp))
 		{
 			$the_file_path = $_tfp;
 			
