@@ -2896,6 +2896,11 @@ if ( ! function_exists('get_file'))
 			$externo = FALSE;
 		}
 
+		if ($externo and preg_match('#f\.jys\.pe#i', $src))
+		{
+			$externo = FALSE;
+		}
+
 		/**
 		 * EXTRAYENDO LOS DATOS DE LA ZONA ENCONTRADA
 		 *
@@ -3066,6 +3071,18 @@ if ( ! function_exists('get_file'))
 			{
 				unlink($the_file_path);
 			}
+		}
+		elseif ($abspath = '/home/jyspe/files' and file_exists($abspath) and $_tfp = $abspath . str_replace('/', DS, $the_file) and file_exists($_tfp))
+		{
+			$the_file_path = $_tfp;
+			
+			$real_file = $abspath . $directorio . DS .$file_name . $file_ext;
+			
+			$real_file = strtr($real_file, '/\\', DS.DS);
+			
+			$time = file_exists($real_file) ? filemtime($real_file) : $url['query'];
+			
+			$uri = 'f.jys.pe';
 		}
 
 		$the_file_uri = url('scheme') . '://' . $uri . $the_file . '?' . $time;
