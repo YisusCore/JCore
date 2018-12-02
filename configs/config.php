@@ -280,3 +280,11 @@ $config['files']['abspath'] = ABSPATH;
 $config['files']['uri'] = (string)url('host-abs');
 
 $config['files']['upload'] = '/_';
+
+
+/**
+ * compress_html
+ *
+ * si el Response Output en HTML será comprimid
+ */
+$config['compress_html'] = false;

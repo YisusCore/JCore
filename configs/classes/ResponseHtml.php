@@ -163,7 +163,7 @@ class ResponseHtml
 		$html = ob_get_contents();
 		ob_end_clean();
 
-		if ( ! is_localhost())
+		if ( ! is_localhost() and config('compress_html'))
 		{
 			$html = html_compressor($html);
 		}
