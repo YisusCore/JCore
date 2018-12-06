@@ -912,7 +912,7 @@ if ( ! function_exists('js_compressor'))
 			}
 		}
 
-		if ($file = ROOTPATH . '/the.libs/minify/require.php' and file_exists($file))
+		if ($file = ROOTPATH . '/config/libs/minify/require.php' and file_exists($file))
 		{
 			try
 			{
@@ -996,7 +996,7 @@ if ( ! function_exists('css_compressor'))
 			}
 		}
 
-		if ($file = ROOTPATH . '/the.libs/minify/require.php' and file_exists($file))
+		if ($file = ROOTPATH . '/config/libs/minify/require.php' and file_exists($file))
 		{
 			try
 			{
