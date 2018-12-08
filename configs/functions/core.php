@@ -794,6 +794,25 @@ if ( ! function_exists('logger'))
 					}
 					
 					$MCON = cbd($host, $user, $pasw, $name);
+					
+					if ( ! sql_et('logs', $MCON))
+					{
+						sql('
+				CREATE TABLE `logs` (
+				  `id` Bigint NOT NULL AUTO_INCREMENT,
+				  `message` Text, 
+				  `severity` Varchar(300),
+				  `code` Varchar(100),
+				  `filepath` Text,
+				  `line` Int (10),
+				  `trace` Json,
+				  `meta` Json,
+				  `estado` Enum ("Registrado", "Visto", "Analizado", "Solucionado") NOT NULL DEFAULT "Registrado",
+				  `creado` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+				  PRIMARY KEY (`id`)
+				) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC', FALSE, $MCON);
+					}
 				}
 				catch (Exception $e)
 				{
@@ -803,38 +822,15 @@ if ( ! function_exists('logger'))
 			
 			IF ($MCON !== FALSE)
 			{
-				if ( ! sql_et('logs', $MCON))
-				{
-					try
-					{
-						sql('
-			CREATE TABLE `logs` (
-			  `id` Bigint NOT NULL AUTO_INCREMENT,
-			  `message` Text, 
-			  `severity` Varchar(300),
-			  `code` Varchar(100),
-			  `filepath` Text,
-			  `line` Int (10),
-			  `trace` Json,
-			  `meta` Json,
-			  `estado` Enum ("Registrado", "Visto", "Analizado", "Solucionado") NOT NULL DEFAULT "Registrado",
-			  `creado` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-
-			  PRIMARY KEY (`id`)
-			) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC', FALSE, $MCON);
-					}
-					catch (Exception $e)
-					{
-						return FALSE;
-					}
-				}
-
 				if (sql_trans('NUMTRANS', $MCON) !== 0)
 				{
 					@sql_trans(false, $MCON);
 				}
 
-				! is_empty($meta) and isset($meta['server']) and isset($meta['server']['SERVER_SIGNATURE']) and $meta['server']['SERVER_SIGNATURE'] = NULL;
+				! is_empty($meta) and 
+					isset($meta['server']) and 
+					isset($meta['server']['SERVER_SIGNATURE']) and 
+					$meta['server']['SERVER_SIGNATURE'] = NULL;
 
 				$query = '
 				INSERT INTO `logs` (`message`, `severity`, `code`, `filepath`, `line`, `trace`, `meta`) 
