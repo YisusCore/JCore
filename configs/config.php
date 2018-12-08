@@ -79,6 +79,8 @@ $config['subclass_prefix'] = 'MY_';
  * Datos de Registros de Logs 
  * (solo en caso de que no se haya guardado antes con el filtro save_logs o en la base datos)
  *
+ * BBDD:				Si es TRUE, tomará la conección de la base datos actual y si es array creará una nueva conección
+ *
  * PATH:				Directorio donde se almacenarán los archivos 
  * FILE_EXT:			Extensión del archivo a crear
  * FILE_PERMISSIONS:	Permisos del archivo a crear
@@ -88,6 +90,8 @@ $config['subclass_prefix'] = 'MY_';
  * @global
  */
 $config['log'] = [];
+
+$config['log']['bbdd'] = TRUE;
 
 $config['log']['path'] = APPPATH . DS . 'logs';
 

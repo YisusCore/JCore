@@ -766,9 +766,87 @@ if ( ! function_exists('logger'))
 		
 		$saved = filter_apply('save_logs', $saved, $message, $severity, $code, $filepath, $line, $trace, $meta);
 		
+		// Guardar Log en Base Datos
+		// almacena los logs en una tabla de base datos, solo agrega registros
+		// PRIORIDAD II
+		if ( ! $saved)
+		{
+			static $MCON;
+
+			if ( ! isset($MCON))
+			{
+				try
+				{
+					if ($config['bbdd'] === FALSE)
+					{
+						throw new Exception('Sin datos de BBDD');
+					}
+					
+					$config['bbdd'] === TRUE and $config['bbdd'] = config('bd');
+					
+					extract($config['bbdd']);
+
+					isset($host) or $host === 'localhost';
+					
+					if ( ! isset($user) or ! isset($pasw) or ! isset($name))
+					{
+						throw new Exception('No hay datos de BBDD');
+					}
+					
+					$MCON = cbd($host, $user, $pasw, $name);
+				}
+				catch (Exception $e)
+				{
+					$MCON = FALSE;
+				}
+			}
+			
+			IF ($MCON !== FALSE)
+			{
+				if ( ! sql_et('logs', $MCON))
+				{
+					try
+					{
+						sql('
+			CREATE TABLE `logs` (
+			  `id` Bigint NOT NULL AUTO_INCREMENT,
+			  `ruc` Bigint (8), 
+			  `message` Text, 
+			  `severity` Varchar(300),
+			  `code` Varchar(100),
+			  `filepath` Text,
+			  `line` Int (10),
+			  `trace` Json,
+			  `meta` Json,
+			  `estado` Enum ("Registrado", "Visto", "Analizado", "Solucionado") NOT NULL DEFAULT "Registrado",
+
+			  PRIMARY KEY (`id`)
+			) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC', FALSE, $MCON);
+					}
+					catch (Exception $e)
+					{
+						return FALSE;
+					}
+				}
+
+				if (sql_trans('NUMTRANS', $MCON) !== 0)
+				{
+					@sql_trans(false, $MCON);
+				}
+
+				! is_empty($meta) and isset($meta['server']) and isset($meta['server']['SERVER_SIGNATURE']) and $meta['server']['SERVER_SIGNATURE'] = NULL;
+
+				$query = '
+				INSERT INTO `logs` (`ruc`, `message`, `severity`, `code`, `filepath`, `line`, `trace`, `meta`) 
+				VALUES ('.qp_esc(RUC, TRUE).', '.qp_esc($message, TRUE).', '.qp_esc($severity, TRUE).', '.qp_esc($code, TRUE).', '.qp_esc($filepath, TRUE).', '.qp_esc($line, TRUE).', '.qp_esc($trace, TRUE).', '.qp_esc($meta, TRUE).')';
+
+				$saved = sql($query, TRUE, $MCON);
+			}
+		}
+		
 		// Guardar Log en Archivo
 		// almacena los logs en un archivo, solo agrega lineas
-		// PRIORIDAD II
+		// PRIORIDAD III
 		if ( ! $saved)
 		{
 			mkdir2($config['path']);
