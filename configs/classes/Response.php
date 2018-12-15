@@ -146,7 +146,7 @@ class Response
 		elseif (
 			(
 				isset($_SERVER['HTTP_X_REQUESTED_WITH']) and 
-			 	(mb_strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest' or mb_strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'androidapp')
+			 	(mb_strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest' or mb_strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'androidapp' or mb_strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'iosapp')
 			) or isset($_GET['json'])
 		)
 		{
