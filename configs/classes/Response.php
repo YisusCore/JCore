@@ -139,7 +139,7 @@ class Response
 		{
 			$this->setType(FORCE_RSP_TYPE);
 		}
-		elseif (isset($_GET['contentOnly']))
+		elseif (isset($_GET['contentOnly']) or (isset($_GET['_']) and $_GET['_'] === 'co'))
 		{
 			$this->setType('CONTENT');
 		}
