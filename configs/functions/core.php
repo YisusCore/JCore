@@ -3148,13 +3148,13 @@ if ( ! function_exists('get_file'))
 		}
 		elseif (preg_match('/modulator/i', $the_file))
 		{
-			$uri = 'f.jys.pe';
+			$turi = 'f.jys.pe';
 			$time= '';
 			$real_file = 'https://f.jys.pe/' . ltrim($the_file, '/');
 			$the_file_path = $real_file;
 		}
 
-		$the_file_uri = url('scheme') . '://' . $uri . $the_file . non_empty($time, function($time){return '?' . $time;});
+		$the_file_uri = url('scheme') . '://' . (isset($turi) ? $turi : $uri) . $the_file . non_empty($time, function($time){return '?' . $time;});
 
 		return (new class ($the_file_uri, $the_file_path) implements JsonSerializable {
 			private $the_file_uri;
