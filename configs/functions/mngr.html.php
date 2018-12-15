@@ -882,7 +882,7 @@ if ( ! function_exists('html_compressor'))
 
 if ( ! function_exists('js_compressor'))
 {
-	function js_compressor ($content = '', $cache = FALSE, $cachetime = NULL)
+	function js_compressor ($content = '', $cache = FALSE, $cachetime = NULL, $use_apiminifier = FALSE)
 	{
 		static $APPPATH;
 		if ( ! isset($APPPATH))
@@ -932,7 +932,7 @@ if ( ! function_exists('js_compressor'))
 
 		try
 		{
-//			if (is_localhost())
+			if ( ! $use_apiminifier)
 			{
 				throw new Exception('Localhost');
 			}
@@ -966,7 +966,7 @@ if ( ! function_exists('js_compressor'))
 
 if ( ! function_exists('css_compressor'))
 {
-	function css_compressor ($content = '', $cache = FALSE, $cachetime = NULL)
+	function css_compressor ($content = '', $cache = FALSE, $cachetime = NULL, $use_apiminifier = FALSE)
 	{
 		static $APPPATH;
 		if ( ! isset($APPPATH))
@@ -1011,7 +1011,7 @@ if ( ! function_exists('css_compressor'))
 
 		try
 		{
-//			if (is_localhost())
+			if ( ! $use_apiminifier)
 			{
 				throw new Exception('Localhost');
 			}
