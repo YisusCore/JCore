@@ -3146,20 +3146,15 @@ if ( ! function_exists('get_file'))
 				unlink($the_file_path);
 			}
 		}
-		elseif ($abspath = '/home/jyspe/public_html/files' and file_exists($abspath) and $_tfp = $abspath . str_replace('/', DS, $the_file) and file_exists($_tfp))
+		elseif (preg_match('/modulator/i', $the_file))
 		{
-			$the_file_path = $_tfp;
-			
-			$real_file = $abspath . $directorio . DS .$file_name . $file_ext;
-			
-			$real_file = strtr($real_file, '/\\', DS.DS);
-			
-			$time = file_exists($real_file) ? filemtime($real_file) : $url['query'];
-			
 			$uri = 'f.jys.pe';
+			$time= '';
+			$real_file = 'https://f.jys.pe/' . ltrim($the_file, '/');
+			$the_file_path = $real_file;
 		}
 
-		$the_file_uri = url('scheme') . '://' . $uri . $the_file . '?' . $time;
+		$the_file_uri = url('scheme') . '://' . $uri . $the_file . non_empty($time, function($time){return '?' . $time;});
 
 		return (new class ($the_file_uri, $the_file_path) implements JsonSerializable {
 			private $the_file_uri;
