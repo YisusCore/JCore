@@ -49,7 +49,7 @@ class ResponseHtml
 		$this->variables['attrs'] = [];
 		$this->variables['attrs']['lang'] = 'es-ES';
 		$this->variables['attrs']['class'] = [];
-		$this->variables['attrs']['xmlns'] = 'https://www.w3.org/1999/xhtml';
+//		$this->variables['attrs']['xmlns'] = 'https://www.w3.org/1999/xhtml';
 		$this->variables['attrs']['prefix'] = 'og: https://ogp.me/ns#';
 		
 		$this->variables['lang'] =& $this->variables['attrs']['lang'];
