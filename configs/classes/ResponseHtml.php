@@ -115,6 +115,8 @@ class ResponseHtml
      */
     public function response()
     {
+		header('Referrer-Policy: no-referrer-when-downgrade');
+		
 		add_inline_js(_o(function(){
 			if (false) { ?><script><?php }
 			
