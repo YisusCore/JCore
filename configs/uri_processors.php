@@ -82,7 +82,7 @@ $processor['/uploader.php'] = function(){
 
 	$name = mb_strtolower($name);
 	$name = explode('.', $name);
-	$ext = count($ext) === 1 ? NULL : array_pop($name);
+	$ext = count($name) === 1 ? NULL : array_pop($name);
 	$name = implode('.', $name);
 
 	if (is_null($ext)){
