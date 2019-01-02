@@ -116,12 +116,15 @@ $processor['/uploader.php'] = function(){
 
 	$href = url('array');
 	$href['host'] = rtrim($uri, '/');
-	$href['path'] = '/' .ltrim(str_replace(DS, '/', $path), '/');
+	$path = $href['path'] = '/' .ltrim(str_replace(DS, '/', $path), '/');
+	
 	$href = build_url($href);
 
 	RSP()
 		-> success('Archivo cargado correctamente')
-		-> addJson('href', $href);
+		-> addJson('href', $href)
+		-> addJson('path', $path)
+	;
 
 	isset($isImagen) and $isImagen and RSP()
 		-> addJson('preview', get_image($href, ['size' => '300x300']))
