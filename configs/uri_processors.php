@@ -115,8 +115,8 @@ $processor['/uploader.php'] = function(){
 	}
 
 	$href = url('array');
-	$href['host'] = $uri;
-	$href['path'] = str_replace(DS, '/', $path);
+	$href['host'] = rtrim($uri, '/');
+	$href['path'] = '/' .ltrim(str_replace(DS, '/', $path), '/');
 	$href = build_url($href);
 
 	RSP()
