@@ -45,3 +45,88 @@ defined('DS') or define('DS', DIRECTORY_SEPARATOR);
 // $processors, $processor, $config
 //==========================================================================================
 
+$processor['/uploader.php'] = function(){
+	defined('APPPATH') or exit('Error');
+
+	if ( ! APP()->Logged)
+	{
+		RSP()
+			-> error('Se requiere de un usuario logueado')
+			-> exit()
+		;
+	}
+
+	$F = $_FILES['archivo'];
+
+	if ($F['error']>0){
+		RSP()
+			-> error('Error al cargar Archivo')
+			-> exit()
+		;
+	}
+
+	extract(config('files'));
+
+	if(preg_match("/^image\/(.*)/", $F['type']))
+	{
+		$images_zones = config('images_zones');
+		extract(end($images_zones));
+
+		$isImagen = TRUE;
+	}
+
+	$dir = DS . $upload . DS . date('Y') . DS . date('m');
+	mkdir2($dir, $abspath);
+
+	extract($F);
+
+	$name = mb_strtolower($name);
+	$name = explode('.', $name);
+	$ext = count($ext) === 1 ? NULL : array_pop($name);
+	$name = implode('.', $name);
+
+	if (is_null($ext)){
+		RSP()
+			-> error('Archivo no tiene extensión')
+			-> exit()
+		;
+	}
+
+	$name = uniqid(strtoslug($name) . '_');
+	if( preg_match('/^php/i', $ext))
+	{
+		$ext = 'html';
+	}
+
+	$path = $dir . DS . $name . '.' . $ext;
+
+	if (file_exists($abspath . $path)){
+		$name = na(5) . "_" . $name;
+		$path = $dir . DS . $name . '.' . $ext;
+	}
+
+	if( ! move_uploaded_file($tmp_name, $abspath . $path)){
+		RSP()
+			-> error('Error al realizar update de file - Origen o Destino no leible.')
+			->addJson('tmp_name', $tmp_name)
+			->addJson('path', $path)
+			-> exit()
+		;
+	}
+
+	$href = url('array');
+	$href['host'] = $uri;
+	$href['path'] = str_replace(DS, '/', $path);
+	$href = build_url($href);
+
+	RSP()
+		-> success('Archivo cargado correctamente')
+		-> addJson('href', $href);
+
+	isset($isImagen) and $isImagen and RSP()
+		-> addJson('preview', get_image($href, ['size' => '300x300']))
+		-> addJson('favicon', get_image($href, ['size' => '50x50']))
+	;
+
+	exit();
+};
