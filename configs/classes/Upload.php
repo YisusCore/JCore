@@ -11,14 +11,7 @@ class Upload extends ArrayObject
 		{
 			try
 			{
-				if ($config['bbdd'] === FALSE)
-				{
-					throw new Exception('Sin datos de BBDD');
-				}
-				
-				$config['bbdd'] === TRUE and $config['bbdd'] = config('bd');
-				
-				extract($config['bbdd']);
+				extract(config('bd'));
 		
 				isset($host) or $host === 'localhost';
 				
