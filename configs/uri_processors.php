@@ -56,7 +56,7 @@ $processor['/uploader.php'] = function(){
 		;
 	}
 
-	use BasicException;
+//	use BasicException;
 	
 	try
 	{
