@@ -1056,7 +1056,7 @@ if ( ! function_exists('_t'))
 			return $langs;
 		}
 
-		$_sprintf = function($frase, ...$params)
+		$_sprintf = function($frase, array $params = [])
 		{
 			array_unshift($params, $frase);
 			return call_user_func_array('sprintf', $params);
@@ -1082,10 +1082,10 @@ if ( ! function_exists('_t'))
 			$n = 1;
 		}
 		
-		is_int($n) OR $n = (int)$n;
+//		is_int($n) OR $n = (int)$n;
 		array_unshift($sprintf, $n);
 		
-		if ( ! isset($langs[$lang]) or ! isset($langs[$lang][$frase]))
+		if ( ! is_array($frase) and ( ! isset($langs[$lang]) or ! isset($langs[$lang][$frase])))
 		{
 			if ($lang <> 'ES')
 			{
@@ -1102,7 +1102,7 @@ if ( ! function_exists('_t'))
 			return $_sprintf($frase, $sprintf);
 		}
 		
-		$traduccion = (array)$langs[$lang][$frase];
+		$traduccion = is_array($frase) ? $frase : (array)$langs[$lang][$frase];
 		
 		switch(count($traduccion))
 		{
