@@ -223,8 +223,8 @@ class Upload extends ArrayObject
 //			'abspath'    => $this->_abspath,
 //			'dir'        => $this->_dir,
 //			'name'       => $this->_fname,
-			'ext'        => $this->_ext,
-			'path'       => $this->_path,
+			'ext'        => $this->_fext,
+			'path'       => $this->_fpath,
 			'href'       => $this->_href,
 			
 			'preview'    => $this->_imagen ? get_image($this->_href, ['size' => '300x300']) : NULL,
