@@ -148,10 +148,11 @@ class Upload extends ArrayObject
 		$this->_uri = $zone['uri'];
 		$this->_abspath = $zone['abspath'];
 		
+		$path = isset($zone['path']) ? $zone['path'] : '';
 		$upload = isset($zone['upload']) ? $zone['upload'] : '_';
 		$upload_yearmonth = isset($zone['upload_yearmonth']) ? $zone['upload_yearmonth'] : TRUE;
 		
-		$this->_dir = DS . $upload . ($upload_yearmonth ? (DS . date('Y') . DS . date('m')) : '');
+		$this->_dir = $path . DS . $upload . ($upload_yearmonth ? (DS . date('Y') . DS . date('m')) : '');
 		
 		mkdir2($this->_dir, $this->_abspath);
 		
