@@ -465,10 +465,10 @@ class Response
 	 */
 	public function set_header($header, $replace = TRUE)
 	{
-// 		if (strncasecmp($header, 'content-length', 14) === 0 and $this->zlib_oc)
-// 		{
-// 			return $this;
-// 		}
+		if (strncasecmp($header, 'content-length', 14) === 0 and $this->_zlib_oc)
+		{
+			return $this;
+		}
 
 		$this->_headers[] = array($header, $replace);
 		return $this;
