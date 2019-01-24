@@ -464,12 +464,12 @@ class ImageMng
 			return;
 		}
 
-		redirect(build_url(url('array')));
+// 		redirect(build_url(url('array')));
 		RSP()
-			->setType('CONTENT', $mime)
-			->set_header('Content-Length', $size)
-			->set_header('Cache-Control', 'max-age=31536000, public')
-			->CONTENT = file_get_contents($local_file);
+			-> setType('FILE', $mime)
+			-> set_header('Content-Length', $size)
+			-> set_header('Cache-Control', 'max-age=31536000, public')
+			-> CONTENT = file_get_contents($local_file);
 		
 		exit();
 	}
