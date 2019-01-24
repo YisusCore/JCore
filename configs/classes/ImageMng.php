@@ -463,15 +463,15 @@ class ImageMng
 			exit ('No se encontró la imagen buscada');
 			return;
 		}
-
-// 		redirect(build_url(url('array')));
+		
 		RSP()
 			-> setType('FILE', $mime)
 			-> set_header('Content-Length', $size)
 			-> set_header('Cache-Control', 'max-age=31536000, public')
-			-> CONTENT = file_get_contents($local_file);
+			-> CONTENT = file_get_contents($local_file)
+        	;
 		
-		exit();
+		die();
 	}
 
 	public function process ($real_file, $new_file, $opt = [])
