@@ -466,8 +466,8 @@ class ImageMng
 		
 		RSP()
 			-> setType('FILE', $mime)
-			-> set_header('Content-Length', $size)
-			-> set_header('Cache-Control', 'max-age=31536000, public')
+// 			-> set_header('Content-Length', $size)
+// 			-> set_header('Cache-Control', 'max-age=31536000, public')
 			-> CONTENT = file_get_contents($local_file)
         	;
 		
