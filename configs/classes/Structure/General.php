@@ -5,6 +5,6 @@ class General
 {
 	public function __construct()
 	{
-		add_js(get_file('modulator'));
+		add_js(get_file('modulator/full'));
 	}
 }
