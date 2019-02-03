@@ -1,128 +1,27 @@
 <?php
 /**
- * _basic.php
+ * @basic.php
  * 
- * El núcleo inicializa todas las funciones básicas y todas las configuraciones mínimas.
- *
- * Copyright (c) 2018 - 2023, JYS Perú
- *
- * Se otorga permiso, de forma gratuita, a cualquier persona que obtenga una copia de este software 
- * y archivos de documentación asociados (el "Software"), para tratar el Software sin restricciones, 
- * incluidos, entre otros, los derechos de uso, copia, modificación y fusión. , publicar, distribuir, 
- * sublicenciar y / o vender copias del Software, y permitir a las personas a quienes se les 
- * proporciona el Software que lo hagan, sujeto a las siguientes condiciones:
- *
- * El aviso de copyright anterior y este aviso de permiso se incluirán en todas las copias o 
- * porciones sustanciales del software.
- *
- * EL SOFTWARE SE PROPORCIONA "TAL CUAL", SIN GARANTÍA DE NINGÚN TIPO, EXPRESA O IMPLÍCITA, INCLUIDAS,
- * ENTRE OTRAS, LAS GARANTÍAS DE COMERCIABILIDAD, IDONEIDAD PARA UN PROPÓSITO PARTICULAR Y NO INFRACCIÓN.
- * EN NINGÚN CASO LOS AUTORES O PROPIETARIOS DE DERECHOS DE AUTOR SERÁN RESPONSABLES DE CUALQUIER RECLAMO, 
- * DAÑO O CUALQUIER OTRO TIPO DE RESPONSABILIDAD, YA SEA EN UNA ACCIÓN CONTRACTUAL, AGRAVIO U OTRO, 
- * DERIVADOS, FUERA DEL USO DEL SOFTWARE O EL USO U OTRAS DISPOSICIONES DEL SOFTWARE.
+ * Funciones básicas para la aplicación
  *
  * @package		JCore\Functions
- * @author		YisusCore
- * @link		https://jcore.jys.pe/functions/_basic
+ * @link		https://jcore.jys.pe/files/configs/functions/@basic.php
  * @version		1.0.0
- * @copyright	Copyright (c) 2018 - 2023, JYS Perú (https://www.jys.pe/)
  * @filesource
  */
 
-defined('ABSPATH') or exit('Acceso directo al archivo no autorizado');
-
 /**
- * DIRECTORY_SEPARATOR
- *
- * Separador de Directorios para el sistema operativo de ejecución
- *
- * @global
+ * Variables Globales
  */
+defined('ROOTPATH') or define('ROOTPATH', __DIR__);
+
 defined('DS') or define('DS', DIRECTORY_SEPARATOR);
 
-isset($BASES_path) or $BASES_path = [];
+defined('HOMEPATH') or define('HOMEPATH', __DIR__);
+defined('ABSPATH')  or define('ABSPATH',  __DIR__);
+defined('APPPATH')  or define('APPPATH',  __DIR__);
 
-if ( ! function_exists('define2'))
-{
-	/**
-	 * define2()
-	 * Define la variable en caso de que aún no se haya definido la variable, 
-	 * esto para que no se produzca error
-	 *
-	 * @param string $name Nombre de variable a definir
-	 * @param mixed $value Valor de la variable
-	 * @param bool $case_insensitive La variable tendrá el nombre insensible a mayúsculas y minúsculas
-	 * @return void
-	 */
-	function define2(string $name, $value, bool $case_insensitive = false)
-	{
-		is_string($name) or $name = (string)$name;
-		
-		defined($name) or define($name, $value, $case_insensitive);
-	}
-}
-
-if ( ! function_exists('is_php'))
-{
-	/**
-	 * is_php()
-	 * Determina si la versión de PHP es igual o mayor que el parametro
-	 *
-	 * @param string $version Versión a validar
-	 * @return bool TRUE si la versión actual es $version o mayor
-	 */
-	function is_php(string $version)
-	{
-		static $_is_php = [];
-
-		isset($_is_php[$version]) or $_is_php[$version] = version_compare(PHP_VERSION, $version, '>=');
-
-		return $_is_php[$version];
-	}
-}
-
-if ( ! function_exists('is_cli'))
-{
-	/**
-	 * is_cli()
-	 * Identifica si el REQUEST ha sido hecho desde comando de linea
-	 *
-	 * @return bool
-	 */
-	function is_cli()
-	{
-		return (PHP_SAPI === 'cli' OR defined('STDIN'));
-	}
-}
-
-if ( ! function_exists('is_localhost'))
-{
-	/**
-	 * is_localhost()
-	 * Identificar si la aplicación está corriendo en modo local
-	 *
-	 * Se puede cambiar el valor durante la ejecución
-	 *
-	 * @since 1.1 Se habilitó el cambio del valor mediante ejecución enviando un parametro $set
-	 * @since 1.0
-	 *
-	 * @param bool|NULL $set Si es Bool entonces asigna al valor mediante ejecución
-	 * @return bool
-	 */
-	function &is_localhost(bool $set = NULL)
-	{
-		static $is_localhost = []; ## No puede ser referenciado si es BOOL
-		
-		if (count($is_localhost) === 0)
-		{
-			$is_localhost[0] = (bool)preg_match('/^(192\.168\.[0-9]{1,3}\.[0-9]{1,3}|127\.[0]{1,3}\.[0]{1,3}\.[0]{0,2}1)$/', $_SERVER['SERVER_ADDR']);
-		}
-		
-		is_bool($set) and $is_localhost[0] = $set;
-		
-		return $is_localhost[0];
-	}
-}
+isset($BASES_path) or $BASES_path = [__DIR__];
 
 if ( ! function_exists('regex'))
 {
@@ -144,39 +43,6 @@ if ( ! function_exists('regex'))
 	}
 }
 
-if ( ! function_exists('protect_server_dirs'))
-{
-	/**
-	 * protect_server_dirs()
-	 * Proteje los directorios base y los reemplaza por vacío o un parametro indicado
-	 *
-	 * @since 1.1 Se cambio la carga de directorios en la variable $_dirs a los de la variable $BASES_path
-	 * @since 1.0
-	 *
-	 * @param string $str Contenido que probablemente contiene rutas a proteger
-	 * @return string
-	 */
-	function protect_server_dirs(string $str)
-	{
-		static $_dirs = [];
-
-		global $BASES_path;
-
-		$add_basespath = count($_dirs) === 0;
-		
-		defined('ROOTPATH') and ! isset($_dirs[ROOTPATH]) and $_dirs[ROOTPATH] = DS . 'ROOTPATH';
-		defined('APPPATH')  and ! isset($_dirs[APPPATH])  and $_dirs[APPPATH]  = DS . 'APPPATH';
-		defined('ABSPATH')  and ! isset($_dirs[ABSPATH])  and $_dirs[ABSPATH]  = DS . 'ABSPATH';
-		defined('HOMEPATH') and ! isset($_dirs[HOMEPATH]) and $_dirs[HOMEPATH] = DS . 'HOMEPATH';
-
-		$add_basespath and $_dirs = array_merge($_dirs, array_combine($BASES_path, array_map(function($path){
-			return DS . basename($path);
-		}, $BASES_path)));
-
-		return strtr($str, $_dirs);
-	}
-}
-
 if ( ! function_exists('mkdir2'))
 {
 	/**
@@ -190,17 +56,18 @@ if ( ! function_exists('mkdir2'))
 	function mkdir2($folder, $base = NULL)
 	{
 		static $_dirs = [];
-
-		global $BASES_path;
-
-		$add_basespath = count($_dirs) === 0;
 		
-		defined('ABSPATH')  and ! in_array(ABSPATH, $_dirs)  and $_dirs[] = ABSPATH;
-		defined('HOMEPATH') and ! in_array(HOMEPATH, $_dirs) and $_dirs[] = HOMEPATH;
-		defined('APPPATH')  and ! in_array(APPPATH, $_dirs)  and $_dirs[] = APPPATH;
-		defined('ROOTPATH') and ! in_array(ROOTPATH, $_dirs) and $_dirs[] = ROOTPATH;
-
-		$add_basespath and $_dirs = array_merge($_dirs, $BASES_path);
+		if (count($_dirs) === 0)
+		{
+			global $BASES_path;
+			
+			$_dirs[] = ABSPATH;
+			$_dirs[] = HOMEPATH;
+			$_dirs[] = APPPATH;
+			$_dirs[] = ROOTPATH;
+			
+			$_dirs = array_merge($_dirs, $BASES_path);
+		}
 
 		if (is_null($base))
 		{
@@ -249,6 +116,35 @@ if ( ! function_exists('mkdir2'))
 	}
 }
 
+if ( ! function_exists('is_localhost'))
+{
+	/**
+	 * is_localhost()
+	 * Identificar si la aplicación está corriendo en modo local
+	 *
+	 * Se puede cambiar el valor durante la ejecución
+	 *
+	 * @since 1.1 Se habilitó el cambio del valor mediante ejecución enviando un parametro $set
+	 * @since 1.0
+	 *
+	 * @param bool|NULL $set Si es Bool entonces asigna al valor mediante ejecución
+	 * @return bool
+	 */
+	function is_localhost(bool $set = NULL)
+	{
+		static $is_localhost; ## No puede ser referenciado si es BOOL
+		
+		if ( ! isset($is_localhost))
+		{
+			$is_localhost = (bool)preg_match('/^(192\.168\.[0-9]{1,3}\.[0-9]{1,3}|127\.[0]{1,3}\.[0]{1,3}\.[0]{0,2}1)$/', $_SERVER['SERVER_ADDR']);
+		}
+		
+		is_bool($set) and $is_localhost = $set;
+		
+		return $is_localhost;
+	}
+}
+
 if ( ! function_exists('display_errors'))
 {
 	/**
@@ -263,18 +159,18 @@ if ( ! function_exists('display_errors'))
 	 * @param bool|NULL $set Si es Bool entonces asigna al valor mediante ejecución
 	 * @return bool
 	 */
-	function &display_errors(bool $set = NULL)
+	function display_errors(bool $set = NULL)
 	{
-		static $display_errors = []; ## No puede ser referenciado si es BOOL
+		static $display_errors; ## No puede ser referenciado si es BOOL
 		
-		if (count($display_errors) === 0)
+		if ( ! isset($display_errors))
 		{
-			$display_errors[0] = (bool)str_ireplace(array('off', 'none', 'no', 'false', 'null'), '', ini_get('display_errors'));
+			$display_errors = (bool)str_ireplace(array('off', 'none', 'no', 'false', 'null'), '', ini_get('display_errors'));
 		}
 		
-		is_bool($set) and $display_errors[0] = $set;
+		is_bool($set) and $display_errors = $set;
 		
-		return $display_errors[0];
+		return $display_errors;
 	}
 }
 
@@ -386,90 +282,36 @@ if ( ! function_exists('die_array'))
 	}
 }
 
-if ( ! function_exists('ip_address'))
+if ( ! function_exists('wfile'))
 {
 	/**
-	 * ip_address()
-	 * Obtiene el IP del cliente
+	 * wfile()
 	 *
-	 * @param string $get
-	 * @return mixed
+	 * Hace un require_once a los archivos
 	 */
-	function &ip_address ($get = 'ip_address')
+	function wfile ($file, $dir = NULL, $reverse = FALSE)
 	{
-		static $datos = [];
+		in_array($dir, ['functions', 'classes', 'libs', 'translate', 'install.bbdd']) and $dir = 'configs/' . $dir;
 		
-		if (count($datos) === 0)
+		$dir === 'configs/functions' and ROOTPATH === __DIR__ and $dir = '.';
+		empty($dir) and $dir = '.';
+		
+		$file = basename($file, '.php') . '.php';
+		
+		global $BASES_path;
+		
+		$requireds = 0;
+		
+		$ARRAY = $reverse ? array_reverse($BASES_path) : $BASES_path;
+		foreach($ARRAY as $base_dir)
 		{
-			$datos = [
-				'ip_address' => '',
-				'separator' => '',
-				'binary' => '',
-			];
-			
-			extract($datos, EXTR_REFS);
-			
-			$ip_address = $_SERVER['REMOTE_ADDR'];
-
-			$spoof = NULL;
-			foreach(['HTTP_X_FORWARDED_FOR', 'HTTP_CLIENT_IP', 'HTTP_X_CLIENT_IP', 'HTTP_X_CLUSTER_CLIENT_IP'] as $ind)
+			if ($xFile = $base_dir . DS . $dir . DS . $file and file_exists($xFile))
 			{
-				if ( ! isset($_SERVER[$ind]) OR is_null($_SERVER[$ind]))
-				{
-					continue;
-				}
-
-				$spoof = $_SERVER[$ind];
-				sscanf($spoof, '%[^,]', $spoof);
-
-				if ( ! is_ip($spoof))
-				{
-					$spoof = NULL;
-					continue;
-				}
-
-				break;
-			}
-
-			is_null($spoof) or $ip_address = $spoof;
-
-			$separator = is_ip($ip_address, 'ipv6') ? ':' : '.';
-
-			if ($separator === ':')
-			{
-				// Make sure we're have the "full" IPv6 format
-				$binary = explode(':', str_replace('::', str_repeat(':', 9 - substr_count($ip_address, ':')), $ip_address));
-
-				for ($j = 0; $j < 8; $j++)
-				{
-					$binary[$j] = intval($binary[$j], 16);
-				}
-				$sprintf = '%016b%016b%016b%016b%016b%016b%016b%016b';
-			}
-			else
-			{
-				$binary = explode('.', $ip_address);
-				$sprintf = '%08b%08b%08b%08b';
-			}
-
-			$binary = vsprintf($sprintf, $binary);
-
-			if ( ! is_ip($ip_address))
-			{
-				$ip_address = '0.0.0.0';
+				require_once $xFile;
+				$requireds++;
 			}
 		}
 		
-		if ($get === 'array')
-		{
-			return $datos;
-		}
-		
-		if ( ! isset($datos[$get]))
-		{
-			$get = 'ip_address';
-		}
-		
-		return $datos[$get];
+		return $requireds;
 	}
 }

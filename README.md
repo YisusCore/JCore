@@ -9,15 +9,12 @@ El aviso de copyright anterior y este aviso de permiso se incluirán en todas la
 EL SOFTWARE SE PROPORCIONA "TAL CUAL", SIN GARANTÍA DE NINGÚN TIPO, EXPRESA O IMPLÍCITA, INCLUIDAS, ENTRE OTRAS, LAS GARANTÍAS DE COMERCIABILIDAD, IDONEIDAD PARA UN PROPÓSITO PARTICULAR Y NO INFRACCIÓN.<br>
 EN NINGÚN CASO LOS AUTORES O PROPIETARIOS DE DERECHOS DE AUTOR SERÁN RESPONSABLES DE CUALQUIER RECLAMO, DAÑO O CUALQUIER OTRO TIPO DE RESPONSABILIDAD, YA SEA EN UNA ACCIÓN CONTRACTUAL, AGRAVIO U OTRO, DERIVADOS, FUERA DEL USO DEL SOFTWARE O EL USO U OTRAS DISPOSICIONES DEL SOFTWARE.
 
-
-> @author		YisusCore<br>
-@link		https://jcore.jys.pe/jcore<br>
-@version		1.0.0<br>
-@copyright	Copyright (c) 2018 - 2023, JYS Perú (https://www.jys.pe/)<br>
+> [JCore PHP v3](https://jcore.jys.pe/v3) Licensed by MIT<br>
+Powered by [JYS Perú](https://www.jys.pe/) &copy; 2019 - 2023<br><small>Todos los derechos reservados</small>
 
 ### Requerimientos
 
-##### Versión PHP
+##### Versión PHP Mínima
 - [x] `5.7`
 
 ##### Módulos Apache
@@ -40,21 +37,21 @@ EN NINGÚN CASO LOS AUTORES O PROPIETARIOS DE DERECHOS DE AUTOR SERÁN RESPONSAB
 - [x] `hash`
 - [ ] `fileinfo`
 
-## CARACTERÍSTICAS DE LA VERSIÓN
+<BR>
 
 ### Variables Globales
 
 Variable | Nombre | Descripción
 ---|---|---
 DS | DIRECTORY_SEPARATOR | Separador de Directorios
-HOMEPATH | DIRECTORIO DEL SITIO  | Directorio Raiz de donde es leído el APP
-SUBPATH | SUBDIRECTORIO DEL SITIO | Subdirectorio donde se encuentra alojado el archivo `init.php`
-ABSPATH | DIRECTORIO ABSOLUTO DEL SITIO | Carpeta donde se encuentra alojado el `init.php`
-ROOTPATH | NÚCLEO JCORE | Ruta a la carpeta del núcleo JCore
-APPPATH | PROCESOS DE APLICACIÓN | Ruta a la carpeta que contiene las funciones, configuraciones, objetos, procesadores y pantallas
+HOMEPATH | DIRECTORIO DEL SITIO  | Directorio Raiz de donde es accedido al sitio
+SUBPATH | SUBDIRECTORIO DEL SITIO | Subdirectorio donde se encuentra alojado los recursos del sitio <br><i><small>(Recomendado cuando se aloja multiples sitios o plataformas en un mismo hosting)</small></i>
+ABSPATH | DIRECTORIO ABSOLUTO DEL SITIO | Equivalente a <i>HOMEPATH</i>&nbsp;<b>.</b>&nbsp;<i>SUBPATH</i>
+APPPATH | PROCESOS DE APLICACIÓN | Ruta a la carpeta que contiene los archivos para el APP
 ENVIRONMENT | AMBIENTE DE DESARROLLO | **Posibles valores:** <br>- desarrollo<br>- pruebas<br>- produccion
-APP_NAMESPACE | NOMINACIÓN DE ENTORNO | Un identificador sencillo de la aplicación que utiliza el núcleo JCore
-$BASES_path | DIRECTORIOS BASES | Array de los directorios base que buscará las estructuras de archivos<br>Se autoagregan los directorios `$APP_path` y `$JCore_path`
+APPNMSP | NOMINACIÓN DE ENTORNO | Un identificador o nominación del APP
+$BASES_path | DIRECTORIOS BASES | Array de los directorios base que buscará las estructuras de archivos<br><small>Se autoagregan los directorios `$APP_path` y `$JCore_path`</small>
+ROOTPATH | DIRECTORIO DEL NÚCLEO | Directorio de JCore PHP
 
 
 <br>
@@ -64,96 +61,59 @@ $BASES_path | DIRECTORIOS BASES | Array de los directorios base que buscará las
 
 Directorio | Detalle
 ---|---
-displays | Contiene todos los manejadores del RESPONSE
-processors | Contiene todos los manejadores del REQUEST
+configs | Contiene los archivos de configuración
+<small>configs/</small>functions | Contiene funciones a usar
+<small>configs/</small>classes | Contiene clases a usar
+<small>configs/</small>libs | Contiene librerías a usar
+<small>configs/</small>translate | Contiene las traducciones
+<small>configs/</small>install.bbdd | Contiene las actualizaciones de la base datos
+response | Contiene los archivos para el RESPONSE
+<small>response/</small>structure | Contiene las estructuras de respuestas
+<small>response/</small>html | <small>(Opcional)</small> <br>Contiene los archivos que se responderán para la WEB
+<small>response/</small>cli | <small>(Opcional)</small> <br>Contiene los archivos que se responderán para las llamadas CLI
+request | Contiene todos los manejadores del REQUEST
+<small>request/</small>cli | <small>(Opcional)</small> <br>Contiene todos los manejadores del REQUEST para cuando sean llamados desde CLI
+<small>request/</small>POST | <small>(Opcional)</small> <br>Contiene todos los manejadores del REQUEST para cuando sean llamados desde POST
 objects | Contiene todos los objetos
-templates | Contiene partes de HTML que pueden ser leídos por las pantallas
-the.configs | Contiene todas las configuraciones
-the.functns | Contiene todas las funciones
-the.classes | Contiene clases utilizables
-the.libs | Contiene librerías a utilizar en la aplicación
-translate | Contiene archivos para cambiar lenguajes
 
-> Se procedió a cambiar las carpetas config, functions, class y libs de la versión V2 por anteponerle `the.` adelante lo cual ofrece una mayor seguridad y mejor orden en las carpetas.
+> Si los directorios **opcionales** no existen, se buscarán los archivos solicitados en la carpeta padre
 
 <br>
 
-### Archivos de Funciones Bases (the.functns)
+### Archivo ```configs/config.php```
 
-Archivo | Detalle
----|---
-_variables | Funciones de conjuntos de Variables
-_mimes | Funciones y clase manipuladora de los mimes
-_validacion | Funciones de validación
-_security | Funciones de Seguridad
-core | Funciones principales del núcleo
-mngr.bbdd | Funciones manipuladores de las BBDDs
-mngr.vrbls | Funciones manipuladores de (Array, Date, Strings, Numerics)
-mngr.files | Funciones manipuladores de (Directory, Download, File)
-mngr.html | Funciones manipuladores de (Html)
-mngr.url | Funciones manipuladores de (URL)
+Contiene las configuraciones de la aplicación<br><br>
 
-
-@see [Lista de Funciones](README.funcs.md)
-
-<br>
-
-### Archivos de Configuraciones (the.configs)
-
-Archivo | Detalle
----|---
-config.php | Contiene las configuraciones básicas
-hooks.php | Contiene todas las tareas programadas
-
-
-<br>
-
-### Configuraciones Básicas
-
-
+##### Configuraciones Básicas:
 
 Opción | Tipo | Descripción | Defecto
 ---|---|---|---
 charset | `String` | Charset por Defecto | `UTF-8`
 timezone | `String` | TimeZone por Defecto | `America/Lima`
-lang | `String`&nbsp;`NULL` | Lenguaje por Defecto | `NULL`<br>Si es NULO, el sistema detecta automáticamente el lenguaje del usuario
-subclass_prefix | `String` | Prefijo para Extensión de Clases | `MY_`
-log | `Array` | Datos de Registros de Logs<br>(Si al ejecutar el filtro `save_logs` retorna `TRUE` entonces ya no se almacenará en el archivo) | @see [Opciones&nbsp;LOG](#opciones-log)
-db - bd | `Array` | Datos de la primera conección de Base Datos | @see [Opciones&nbsp;DB&nbsp;-&nbsp;BD](#opciones-db-bd)
-functions_files | `Array` | Listado de archivos de funciones | `[vacío]`
-autoload_paths | `Array` | Listado de directorios donde buscar las clases no encontradas | `[vacío]`
-www | `Boolean`&nbsp;`NULL` | WWW por Defecto<br>Si es NULO entonces no validará que se haya ingresado con el WWW deseado | `NULL`
-https | `Boolean`&nbsp;`NULL` | HTTPS por Defecto<br>Si es NULO entonces no validará que se haya ingresado con el HTTP(s) deseado | `NULL`
-allowed_http_methods | `Array` | Métodos autorizados para llamar los REQUESTs | `['GET', 'POST']`
+lang | `String`&nbsp;/&nbsp;`NULL` | Lenguaje por Defecto<br><b><small>(NULO = Detecta Lenguaje del Navegador)</small></b> | `NULL`
+db / bd / bbdd | `Array` | Datos de la primera conección de Base Datos<br><b><small>(No se conectará si no esta el atributo ```name```)</small></b> | ```['host' => 'localhost', 'user' => 'root', 'pasw' => 'mysql']```
+www | `Boolean`&nbsp;/&nbsp;`NULL` | WWW por Defecto<br><b><small>(NULO = No valida cual se ha usado)</small></b> | `NULL`
+https | `Boolean`&nbsp;`NULL` | HTTPS por Defecto<br><b><small>(NULO = No valida cual se ha usado)</small></b> | `NULL`
+http_methods | `Array` | Métodos autorizados para procesar los REQUESTs | `['GET', 'POST']`
 default_method | `String` | El método por defecto para las uris que no se han indicado un parametro de método | `index`
-home_display | `String` | El display por defecto para cuando el URI se encuentre vacío | `inicio`
-error404_display | `String` | El display por defecto para cuando no se encuentre un display correcto | `error404`
-images_zones | `Array` | Lista de Zonas o aplicaciones que permiten el procesamiento de la carga de imagenes. | @see [Opciones&nbsp;Zonas&nbsp;de&nbsp;Imágenes](#opciones-zonas-de-imagenes)
-files | `Array` | Datos de la configuración para la carga de archivos en modo local (servidor local) | @see [Opciones&nbsp;Files](#opciones-files)
+home_display | `String` | El display por defecto para cuando el URI se encuentre vacío | `Inicio`
+error404_display | `String` | El display por defecto para cuando no se encuentre un display correcto | `Error404`
+images_zones | `Array` | Lista de Zonas o aplicaciones que permiten el procesamiento de la carga de imagenes. | ```['uri' => HOST, 'abspath' => ABSPATH, 'path' => SUBDIR_FROM_ABSPATH, 'upload' => UPLOAD_SUBDIR, 'slug' => SLUG]```
+files_zones | `Array` | Lista de Zonas o aplicaciones que permiten el procesamiento de la carga de archivos. | ```['uri' => HOST, 'abspath' => ABSPATH, 'path' => SUBDIR_FROM_ABSPATH, 'upload' => UPLOAD_SUBDIR]```
+subclass_prefix | `String` | Prefijo para Extensión de Clases | `MY_`
 
 <br>
 
-##### Opciones LOG
+### Archivo ```configs/hook.php```
+
+Contiene las tareas programadas de la aplicación<br><br>
 
 
-Opción | Tipo | Descripción | Defecto
----|---|---|---
-path | `String` | Directorio donde se almacenarán los archivos  | `APPPATH . DS . 'logs'`
-file_ext | `String` | Extensión del archivo a crear  | `csv`
-file_permissions | `Integer` | Permisos del archivo a crear  | `0644`
-format_line | `Callable` | Función que retorna la linea `String` que se agregará al archivo | `function ($message, $severity, $code, $filepath, $line, $trace, $meta)`
+### Archivo ```configs/install.bbdd/require.php```
 
-<br>
-
-##### Opciones DB - BD
+Contiene las actualizaciones de la base datos<br><br>
 
 
-Opción | Tipo | Descripción | Defecto
----|---|---|---
-host | `String` | Host del servidor mysql  | `localhost`
-user | `String` | Usuario para conectar en el servidor  | `root`
-pasw | `String` | Clave de la conección.´<BR>(Si es NULO entonces el usuario no requiere de clave)  | `mysql`
-name | `String` | Nombre de la base datos autorizado | `intranet`
-pref | `String` | Prefijo que se utilizará para la creación de tablas por defecto | `jc_`
+### Archivo ```ROOTPATH/configs/functions/@base.php```
 
-
+Contiene las funciones base para la APP<br><br>

@@ -4,43 +4,11 @@
  * 
  * Funciones principales del núcleo
  *
- * Copyright (c) 2018 - 2023, JYS Perú
- *
- * Se otorga permiso, de forma gratuita, a cualquier persona que obtenga una copia de este software 
- * y archivos de documentación asociados (el "Software"), para tratar el Software sin restricciones, 
- * incluidos, entre otros, los derechos de uso, copia, modificación y fusión. , publicar, distribuir, 
- * sublicenciar y / o vender copias del Software, y permitir a las personas a quienes se les 
- * proporciona el Software que lo hagan, sujeto a las siguientes condiciones:
- *
- * El aviso de copyright anterior y este aviso de permiso se incluirán en todas las copias o 
- * porciones sustanciales del software.
- *
- * EL SOFTWARE SE PROPORCIONA "TAL CUAL", SIN GARANTÍA DE NINGÚN TIPO, EXPRESA O IMPLÍCITA, INCLUIDAS,
- * ENTRE OTRAS, LAS GARANTÍAS DE COMERCIABILIDAD, IDONEIDAD PARA UN PROPÓSITO PARTICULAR Y NO INFRACCIÓN.
- * EN NINGÚN CASO LOS AUTORES O PROPIETARIOS DE DERECHOS DE AUTOR SERÁN RESPONSABLES DE CUALQUIER RECLAMO, 
- * DAÑO O CUALQUIER OTRO TIPO DE RESPONSABILIDAD, YA SEA EN UNA ACCIÓN CONTRACTUAL, AGRAVIO U OTRO, 
- * DERIVADOS, FUERA DEL USO DEL SOFTWARE O EL USO U OTRAS DISPOSICIONES DEL SOFTWARE.
- *
  * @package		JCore\Functions
- * @author		YisusCore
- * @link		https://jcore.jys.pe/functions/core
+ * @link		https://jcore.jys.pe/files/config/functions/core.php
  * @version		1.0.0
- * @copyright	Copyright (c) 2018 - 2023, JYS Perú (https://www.jys.pe/)
  * @filesource
  */
-
-defined('ABSPATH') or exit('Acceso directo al archivo no autorizado');
-
-/**
- * DIRECTORY_SEPARATOR
- *
- * Separador de Directorios para el sistema operativo de ejecución
- *
- * @global
- */
-defined('DS') or define('DS', DIRECTORY_SEPARATOR);
-
-isset($BASES_path) or $BASES_path = [];
 
 //=========================================================
 // Hooks
@@ -317,188 +285,6 @@ if ( ! function_exists('action_apply'))
 	}
 }
 
-
-//=========================================================
-// Manipuladores
-//=========================================================
-
-if ( ! function_exists('redirect'))
-{
-	/**
-	 * redirect()
-	 * Redirecciona a una URL
-	 *
-	 * @param	string	$url	El link a redireccionar
-	 * @return	void
-	 */
-	function redirect($url, $query = NULL)
-	{
-		error_reporting(0);
-		
-		$url = parse_url($url);
-		
-		isset($url['scheme'])   or $url['scheme'] = url('scheme');
-		if ( ! isset($url['host']))
-		{
-			$url['host'] = url('host');
-			$url['path'] = url('uri_subpath') . '/' . ltrim($url['path'], '/');
-		}
-		
-		if ( ! is_null($query))
-		{
-			isset($url['query'])    or $url['query']  = [];
-			is_array($url['query']) or $url['query']  = parse_str($url['query']);
-			
-			$url['query'] = array_merge($url['query'], $query);
-		}
-
-		$url = build_url($url);
-
-		while (ob_get_level() > 0)
-		{
-			ob_end_clean();
-		}
-
-		header('Location: ' . $url) OR die('<script>location.replace("' . $url . '");</script>');
-		die();
-	}
-}
-
-if ( ! function_exists('set_status_header'))
-{
-	/**
-	 * set_status_header()
-	 * Establece la cabecera del status HTTP
-	 *
-	 * @param	int		$code	El codigo
-	 * @param	string	$text	El texto del estado
-	 * @return	void
-	 */
-	function set_status_header($code = 200, $text = '')
-	{
-		if (is_cli())
-		{
-			return;
-		}
-		
-		is_int($code) OR $code = (int) $code;
-
-		if (empty($text))
-		{
-			$def_codes_text = [
-				100	=> 'Continue',
-				101	=> 'Switching Protocols',
-
-				200	=> 'OK',
-				201	=> 'Created',
-				202	=> 'Accepted',
-				203	=> 'Non-Authoritative Information',
-				204	=> 'No Content',
-				205	=> 'Reset Content',
-				206	=> 'Partial Content',
-
-				300	=> 'Multiple Choices',
-				301	=> 'Moved Permanently',
-				302	=> 'Found',
-				303	=> 'See Other',
-				304	=> 'Not Modified',
-				305	=> 'Use Proxy',
-				307	=> 'Temporary Redirect',
-
-				400	=> 'Bad Request',
-				401	=> 'Unauthorized',
-				402	=> 'Payment Required',
-				403	=> 'Forbidden',
-				404	=> 'Not Found',
-				405	=> 'Method Not Allowed',
-				406	=> 'Not Acceptable',
-				407	=> 'Proxy Authentication Required',
-				408	=> 'Request Timeout',
-				409	=> 'Conflict',
-				410	=> 'Gone',
-				411	=> 'Length Required',
-				412	=> 'Precondition Failed',
-				413	=> 'Request Entity Too Large',
-				414	=> 'Request-URI Too Long',
-				415	=> 'Unsupported Media Type',
-				416	=> 'Requested Range Not Satisfiable',
-				417	=> 'Expectation Failed',
-				422	=> 'Unprocessable Entity',
-				426	=> 'Upgrade Required',
-				428	=> 'Precondition Required',
-				429	=> 'Too Many Requests',
-				431	=> 'Request Header Fields Too Large',
-
-				500	=> 'Internal Server Error',
-				501	=> 'Not Implemented',
-				502	=> 'Bad Gateway',
-				503	=> 'Service Unavailable',
-				504	=> 'Gateway Timeout',
-				505	=> 'HTTP Version Not Supported',
-				511	=> 'Network Authentication Required',
-			];
-
-			if (isset($def_codes_text[$code]))
-			{
-				$text = $def_codes_text[$code];
-			}
-			else
-			{
-				$text = 'Non Status Text';
-			}
-		}
-
-		if (strpos(PHP_SAPI, 'cgi') === 0)
-		{
-			header('Status: '.$code.' '.$text, TRUE);
-			return TRUE;
-		}
-
-		$server_protocol = (isset($_SERVER['SERVER_PROTOCOL']) && 
-							in_array($_SERVER['SERVER_PROTOCOL'], ['HTTP/1.0', 'HTTP/1.1', 'HTTP/2'], TRUE))
-			? $_SERVER['SERVER_PROTOCOL'] 
-			: 'HTTP/1.1';
-		header($server_protocol.' '.$code.' '.$text, TRUE, $code);
-		
-		return TRUE;
-	}
-}
-
-if ( ! function_exists('http_code'))
-{
-	/**
-	 * http_code()
-	 * Establece la cabecera del status HTTP
-	 *
-	 * @use	set_status_header()
-	 * @param	int		$code	El codigo
-	 * @param	string	$text	El texto del estado
-	 * @return	void
-	 */
-	function http_code($code = 200, $text = '')
-	{
-		return set_status_header($code, $text);
-	}
-}
-
-if ( ! function_exists('getUTC'))
-{
-	/**
-	 * getUTC()
-	 * Obtiene el UTC del timezone actual
-	 *
-	 * @return string
-	 */
-	function getUTC()
-	{
-		$dtz = new DateTimeZone(date_default_timezone_get());
-		$dt  = new DateTime('now', $dtz);
-		$offset = $dtz->getOffset($dt);
-
-		return sprintf( "%s%02d:%02d", ( $offset >= 0 ) ? '+' : '-', abs( $offset / 3600 ), abs( $offset % 3600 ) );
-	}
-}
-
 //=========================================================
 // JCore
 //=========================================================
@@ -518,7 +304,14 @@ if ( ! function_exists('logger'))
 	 * @param array|null 	$trace		(Optional) La ruta que tomó la ejecución hasta llegar al error
 	 * @return void
 	 */
-	function logger ($message, $code = NULL, $severity = NULL, $meta = NULL, $filepath = NULL, $line = NULL, $trace = NULL, $show = TRUE)
+	function logger ($message, 
+					 $code = NULL, 
+					 $severity = NULL, 
+					 $meta = NULL, 
+					 $filepath = NULL, 
+					 $line = NULL, 
+					 $trace = NULL, 
+					 $show = TRUE)
 	{
 		/**
 		 * Listado de Levels de Errores
@@ -547,8 +340,6 @@ if ( ! function_exists('logger'))
 		];
 		
 		static $saving = FALSE;
-
-		$config = config('log');
 		
 		is_bool($code) and $show = $code and $code = NULL;
 		
@@ -559,114 +350,60 @@ if ( ! function_exists('logger'))
 		is_null($meta) and $meta = [];
 		is_array($meta) or $meta = (array)$meta;
 		
+		$meta['datetime'] = date('d.m.Y H:i:s');
 		$meta['time'] = time();
-		$meta['datetime'] = function_exists('date2') ? date2('LL') : date('Y-m-d H:i:s');
 		$meta['microtime'] = microtime();
 		$meta['microtime_float'] = microtime(true);
+		$meta['APPNMSP'] = defined('APPNMSP') ? APPNMSP : NULL;
 		
 		try
 		{
-			$APP = APP();
+			$meta['buffer'] = OPB() -> stop() -> getContents();
 		}
-		catch (\BasicException $e){}
-		catch (\Exception $e){}
-		catch (\TypeError $e){}
-		catch (\Error $e){}
-		finally
-		{
-			$meta['APP_loadable'] = isset($APP);
-		}
+		catch (BasicException $e){}
+		catch (Exception $e){}
+		catch (TypeError $e){}
+		catch (Error $e){}
 		
 		try
 		{
-			$RSP = RSP();
+			$meta['BMKTime'] = BenchMark::instance() -> between('total_execution_time_start');
 		}
-		catch (\BasicException $e){}
-		catch (\Exception $e){}
-		catch (\TypeError $e){}
-		catch (\Error $e){}
-		finally
-		{
-			$meta['RSP_loadable'] = isset($RSP);
-		}
-				
-		try
-		{
-			$RTR = RTR();
-		}
-		catch (\BasicException $e){}
-		catch (\Exception $e){}
-		catch (\TypeError $e){}
-		catch (\Error $e){}
-		finally
-		{
-			$meta['RTR_loadable'] = isset($RTR);
-		}
+		catch (BasicException $e){}
+		catch (Exception $e){}
+		catch (TypeError $e){}
+		catch (Error $e){}
 		
-		try
-		{
-			$OPB = OPB();
-		}
-		catch (\BasicException $e){}
-		catch (\Exception $e){}
-		catch (\TypeError $e){}
-		catch (\Error $e){}
-		finally
-		{
-			$meta['OPB_loadable'] = isset($OPB);
-		}
-		
-		try
-		{
-			$BMK = BenchMark::instance();
-		}
-		catch (\BasicException $e){}
-		catch (\Exception $e){}
-		catch (\TypeError $e){}
-		catch (\Error $e){}
-		finally
-		{
-			$meta['BMK_loadable'] = isset($BMK);
-		}
-		
-		isset($OPB) and
-		$meta['buffer'] = $OPB -> stop() -> getContents();
-
-		isset($BMK) and
-		$meta['BMKTime'] = $BMK -> between('total_execution_time_start');
-
 		if ($message instanceof BasicException)
 		{
 			$exception = $message;
 			
 			$meta = array_merge($exception->getMeta(), $meta);
 			is_null($severity) and $severity = 'BasicException';
-			$meta['class'] = get_class($exception);
 		}
 		elseif ($message instanceof Exception)
 		{
 			$exception = $message;
 			
 			is_null($severity) and $severity = 'Exception';
-			$meta['class'] = get_class($exception);
 		}
 		elseif ($message instanceof TypeError)
 		{
 			$exception = $message;
 			
-			is_null($severity) and $severity = 'Error';
-			$meta['class'] = get_class($exception);
+			is_null($severity) and $severity = 'TypeError';
 		}
 		elseif ($message instanceof Error)
 		{
 			$exception = $message;
 			
 			is_null($severity) and $severity = 'Error';
-			$meta['class'] = get_class($exception);
 		}
 		
 		if (isset($exception))
 		{
+			$meta['class'] = get_class($exception);
+			
 			$message  = $exception->getMessage();
 			
 			is_null($filepath) and $filepath = $exception->getFile();
@@ -696,7 +433,7 @@ if ( ! function_exists('logger'))
 				array_shift($trace);
 			}
 			
-			if (in_array($trace[0]['function'], ['_exception_handler', '_error_handler']))
+			if (in_array($trace[0]['function'], ['_exception_handler', '_error_handler', '_shutdown_handler']))
 			{
 				array_shift($trace);
 			}
@@ -726,35 +463,23 @@ if ( ! function_exists('logger'))
 		
 		try
 		{
-			$url = url('array');
+			$meta['url'] = url('array');
 		}
-		catch (\BasicException $e){}
-		catch (\Exception $e){}
-		catch (\TypeError $e){}
-		catch (\Error $e){}
-		finally
-		{
-			$meta['URL_loadable'] = isset($url);
-		}
-		
-		isset($url) and
-		$meta['url'] = $url;
+		catch (BasicException $e){}
+		catch (Exception $e){}
+		catch (TypeError $e){}
+		catch (Error $e){}
 		
 		try
 		{
-			$ip_address = ip_address('array');
+			$meta['ip_address'] = ip_address('array');
 		}
-		catch (\BasicException $e){}
-		catch (\Exception $e){}
-		catch (\TypeError $e){}
-		catch (\Error $e){}
-		finally
-		{
-			$meta['IPADRESS_loadable'] = isset($url);
-		}
+		catch (BasicException $e){}
+		catch (Exception $e){}
+		catch (TypeError $e){}
+		catch (Error $e){}
 		
-		isset($ip_address) and
-		$meta['ip_address'] = $ip_address;
+		$meta = filter_apply('logger_meta', $meta);
 		
 		$saving and $error_while_saving = TRUE; // Se produjo un error mientras
 		
@@ -777,14 +502,7 @@ if ( ! function_exists('logger'))
 			{
 				try
 				{
-					if ($config['bbdd'] === FALSE)
-					{
-						throw new Exception('Sin datos de BBDD');
-					}
-					
-					$config['bbdd'] === TRUE and $config['bbdd'] = config('bd');
-					
-					extract($config['bbdd']);
+					extract(config('bd'));
 
 					isset($host) or $host === 'localhost';
 					
@@ -845,34 +563,19 @@ if ( ! function_exists('logger'))
 		// PRIORIDAD III
 		if ( ! $saved)
 		{
-			mkdir2($config['path']);
+			defined('APPPATH') or exit('logger requiere de variable APPPATH');
+			$log_path = mkdir2('log', APPPATH);
 
-			$log_file = $config['path'] . DS . 'log-' . date('Y-m') . '.' . $config['file_ext'];
-			$msg_file = '';
-
-			if ( ! file_exists($log_file))
-			{
-				$newfile = TRUE;
-
-				if ($config['file_ext'] === 'php')
-				{
-					$msg_file .= "<?php exit('No direct script access allowed'); ?>\n\n";
-				}
-			}
-
-			$msg_file .= $config['format_line']($message, $severity, $code, $filepath, $line, $trace, $meta);
+			$log_file = $log_path . DS . 'L' . date('Ymd') . '.log';
+			$msg_file = $severity . ' ('.$code.'): '.$message .' at '. $filepath .' #' .$line;
 
 			$result = file_put_contents($log_file, $msg_file, FILE_APPEND | LOCK_EX);
 
-			if (isset($newfile) && $newfile === TRUE)
-			{
-				chmod($log_file, $config['file_permissions']);
-			}
-			
 			$saved = is_int($result);
 		}
 		
 		}
+		
 		## Mostrar Log en Web
 		if ((display_errors() and $show) or isset($error_while_saving))
 		{
@@ -3794,3 +3497,360 @@ if ( ! function_exists('mark'))
 		class2('BenchMark', 'class')-> mark($key);
 	}
 }
+
+
+if ( ! function_exists('define2'))
+{
+	/**
+	 * define2()
+	 * Define la variable en caso de que aún no se haya definido la variable, 
+	 * esto para que no se produzca error
+	 *
+	 * @param string $name Nombre de variable a definir
+	 * @param mixed $value Valor de la variable
+	 * @param bool $case_insensitive La variable tendrá el nombre insensible a mayúsculas y minúsculas
+	 * @return void
+	 */
+	function define2(string $name, $value, bool $case_insensitive = false)
+	{
+		is_string($name) or $name = (string)$name;
+		
+		defined($name) or define($name, $value, $case_insensitive);
+	}
+}
+
+if ( ! function_exists('is_php'))
+{
+	/**
+	 * is_php()
+	 * Determina si la versión de PHP es igual o mayor que el parametro
+	 *
+	 * @param string $version Versión a validar
+	 * @return bool TRUE si la versión actual es $version o mayor
+	 */
+	function is_php(string $version)
+	{
+		static $_is_php = [];
+
+		isset($_is_php[$version]) or $_is_php[$version] = version_compare(PHP_VERSION, $version, '>=');
+
+		return $_is_php[$version];
+	}
+}
+
+if ( ! function_exists('is_cli'))
+{
+	/**
+	 * is_cli()
+	 * Identifica si el REQUEST ha sido hecho desde comando de linea
+	 *
+	 * @return bool
+	 */
+	function is_cli()
+	{
+		return (PHP_SAPI === 'cli' OR defined('STDIN'));
+	}
+}
+
+if ( ! function_exists('protect_server_dirs'))
+{
+	/**
+	 * protect_server_dirs()
+	 * Proteje los directorios base y los reemplaza por vacío o un parametro indicado
+	 *
+	 * @since 1.1 Se cambio la carga de directorios en la variable $_dirs a los de la variable $BASES_path
+	 * @since 1.0
+	 *
+	 * @param string $str Contenido que probablemente contiene rutas a proteger
+	 * @return string
+	 */
+	function protect_server_dirs(string $str)
+	{
+		static $_dirs = [];
+
+		global $BASES_path;
+
+		$add_basespath = count($_dirs) === 0;
+		
+		defined('ROOTPATH') and ! isset($_dirs[ROOTPATH]) and $_dirs[ROOTPATH] = DS . 'ROOTPATH';
+		defined('APPPATH')  and ! isset($_dirs[APPPATH])  and $_dirs[APPPATH]  = DS . 'APPPATH';
+		defined('ABSPATH')  and ! isset($_dirs[ABSPATH])  and $_dirs[ABSPATH]  = DS . 'ABSPATH';
+		defined('HOMEPATH') and ! isset($_dirs[HOMEPATH]) and $_dirs[HOMEPATH] = DS . 'HOMEPATH';
+
+		$add_basespath and $_dirs = array_merge($_dirs, array_combine($BASES_path, array_map(function($path){
+			return DS . basename($path);
+		}, $BASES_path)));
+
+		return strtr($str, $_dirs);
+	}
+}
+
+if ( ! function_exists('ip_address'))
+{
+	/**
+	 * ip_address()
+	 * Obtiene el IP del cliente
+	 *
+	 * @param string $get
+	 * @return mixed
+	 */
+	function ip_address ($get = 'ip_address')
+	{
+		static $datos = [];
+		
+		if (count($datos) === 0)
+		{
+			$datos = [
+				'ip_address' => '',
+				'separator' => '',
+				'binary' => '',
+			];
+			
+			extract($datos, EXTR_REFS);
+			
+			$ip_address = $_SERVER['REMOTE_ADDR'];
+
+			$spoof = NULL;
+			foreach(['HTTP_X_FORWARDED_FOR', 'HTTP_CLIENT_IP', 'HTTP_X_CLIENT_IP', 'HTTP_X_CLUSTER_CLIENT_IP'] as $ind)
+			{
+				if ( ! isset($_SERVER[$ind]) OR is_null($_SERVER[$ind]))
+				{
+					continue;
+				}
+
+				$spoof = $_SERVER[$ind];
+				sscanf($spoof, '%[^,]', $spoof);
+
+				if ( ! is_ip($spoof))
+				{
+					$spoof = NULL;
+					continue;
+				}
+
+				break;
+			}
+
+			is_null($spoof) or $ip_address = $spoof;
+
+			$separator = is_ip($ip_address, 'ipv6') ? ':' : '.';
+
+			if ($separator === ':')
+			{
+				// Make sure we're have the "full" IPv6 format
+				$binary = explode(':', str_replace('::', str_repeat(':', 9 - substr_count($ip_address, ':')), $ip_address));
+
+				for ($j = 0; $j < 8; $j++)
+				{
+					$binary[$j] = intval($binary[$j], 16);
+				}
+				$sprintf = '%016b%016b%016b%016b%016b%016b%016b%016b';
+			}
+			else
+			{
+				$binary = explode('.', $ip_address);
+				$sprintf = '%08b%08b%08b%08b';
+			}
+
+			$binary = vsprintf($sprintf, $binary);
+
+			if ( ! is_ip($ip_address))
+			{
+				$ip_address = '0.0.0.0';
+			}
+		}
+		
+		if ($get === 'array')
+		{
+			return $datos;
+		}
+		
+		if ( ! isset($datos[$get]))
+		{
+			$get = 'ip_address';
+		}
+		
+		return $datos[$get];
+	}
+}
+
+//=========================================================
+// Manipuladores
+//=========================================================
+
+if ( ! function_exists('redirect'))
+{
+	/**
+	 * redirect()
+	 * Redirecciona a una URL
+	 *
+	 * @param	string	$url	El link a redireccionar
+	 * @return	void
+	 */
+	function redirect($url, $query = NULL)
+	{
+		error_reporting(0);
+		
+		$url = parse_url($url);
+		
+		isset($url['scheme'])   or $url['scheme'] = url('scheme');
+		if ( ! isset($url['host']))
+		{
+			$url['host'] = url('host');
+			$url['path'] = url('uri_subpath') . '/' . ltrim($url['path'], '/');
+		}
+		
+		if ( ! is_null($query))
+		{
+			isset($url['query'])    or $url['query']  = [];
+			is_array($url['query']) or $url['query']  = parse_str($url['query']);
+			
+			$url['query'] = array_merge($url['query'], $query);
+		}
+
+		$url = build_url($url);
+
+		while (ob_get_level() > 0)
+		{
+			ob_end_clean();
+		}
+
+		header('Location: ' . $url) OR die('<script>location.replace("' . $url . '");</script>');
+		die();
+	}
+}
+
+if ( ! function_exists('set_status_header'))
+{
+	/**
+	 * set_status_header()
+	 * Establece la cabecera del status HTTP
+	 *
+	 * @param	int		$code	El codigo
+	 * @param	string	$text	El texto del estado
+	 * @return	void
+	 */
+	function set_status_header($code = 200, $text = '')
+	{
+		if (is_cli())
+		{
+			return;
+		}
+		
+		is_int($code) OR $code = (int) $code;
+
+		if (empty($text))
+		{
+			$def_codes_text = [
+				100	=> 'Continue',
+				101	=> 'Switching Protocols',
+
+				200	=> 'OK',
+				201	=> 'Created',
+				202	=> 'Accepted',
+				203	=> 'Non-Authoritative Information',
+				204	=> 'No Content',
+				205	=> 'Reset Content',
+				206	=> 'Partial Content',
+
+				300	=> 'Multiple Choices',
+				301	=> 'Moved Permanently',
+				302	=> 'Found',
+				303	=> 'See Other',
+				304	=> 'Not Modified',
+				305	=> 'Use Proxy',
+				307	=> 'Temporary Redirect',
+
+				400	=> 'Bad Request',
+				401	=> 'Unauthorized',
+				402	=> 'Payment Required',
+				403	=> 'Forbidden',
+				404	=> 'Not Found',
+				405	=> 'Method Not Allowed',
+				406	=> 'Not Acceptable',
+				407	=> 'Proxy Authentication Required',
+				408	=> 'Request Timeout',
+				409	=> 'Conflict',
+				410	=> 'Gone',
+				411	=> 'Length Required',
+				412	=> 'Precondition Failed',
+				413	=> 'Request Entity Too Large',
+				414	=> 'Request-URI Too Long',
+				415	=> 'Unsupported Media Type',
+				416	=> 'Requested Range Not Satisfiable',
+				417	=> 'Expectation Failed',
+				422	=> 'Unprocessable Entity',
+				426	=> 'Upgrade Required',
+				428	=> 'Precondition Required',
+				429	=> 'Too Many Requests',
+				431	=> 'Request Header Fields Too Large',
+
+				500	=> 'Internal Server Error',
+				501	=> 'Not Implemented',
+				502	=> 'Bad Gateway',
+				503	=> 'Service Unavailable',
+				504	=> 'Gateway Timeout',
+				505	=> 'HTTP Version Not Supported',
+				511	=> 'Network Authentication Required',
+			];
+
+			if (isset($def_codes_text[$code]))
+			{
+				$text = $def_codes_text[$code];
+			}
+			else
+			{
+				$text = 'Non Status Text';
+			}
+		}
+
+		if (strpos(PHP_SAPI, 'cgi') === 0)
+		{
+			header('Status: '.$code.' '.$text, TRUE);
+			return TRUE;
+		}
+
+		$server_protocol = (isset($_SERVER['SERVER_PROTOCOL']) && 
+							in_array($_SERVER['SERVER_PROTOCOL'], ['HTTP/1.0', 'HTTP/1.1', 'HTTP/2'], TRUE))
+			? $_SERVER['SERVER_PROTOCOL'] 
+			: 'HTTP/1.1';
+		header($server_protocol.' '.$code.' '.$text, TRUE, $code);
+		
+		return TRUE;
+	}
+}
+
+if ( ! function_exists('http_code'))
+{
+	/**
+	 * http_code()
+	 * Establece la cabecera del status HTTP
+	 *
+	 * @use	set_status_header()
+	 * @param	int		$code	El codigo
+	 * @param	string	$text	El texto del estado
+	 * @return	void
+	 */
+	function http_code($code = 200, $text = '')
+	{
+		return set_status_header($code, $text);
+	}
+}
+
+if ( ! function_exists('getUTC'))
+{
+	/**
+	 * getUTC()
+	 * Obtiene el UTC del timezone actual
+	 *
+	 * @return string
+	 */
+	function getUTC()
+	{
+		$dtz = new DateTimeZone(date_default_timezone_get());
+		$dt  = new DateTime('now', $dtz);
+		$offset = $dtz->getOffset($dt);
+
+		return sprintf( "%s%02d:%02d", ( $offset >= 0 ) ? '+' : '-', abs( $offset / 3600 ), abs( $offset % 3600 ) );
+	}
+}
+

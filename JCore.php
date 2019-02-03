@@ -4,32 +4,18 @@
  * 
  * El núcleo inicializa todas las funciones básicas y todas las configuraciones mínimas.
  *
- * Copyright (c) 2018 - 2023, JYS Perú
- *
- * Se otorga permiso, de forma gratuita, a cualquier persona que obtenga una copia de este software 
- * y archivos de documentación asociados (el "Software"), para tratar el Software sin restricciones, 
- * incluidos, entre otros, los derechos de uso, copia, modificación y fusión. , publicar, distribuir, 
- * sublicenciar y / o vender copias del Software, y permitir a las personas a quienes se les 
- * proporciona el Software que lo hagan, sujeto a las siguientes condiciones:
- *
- * El aviso de copyright anterior y este aviso de permiso se incluirán en todas las copias o 
- * porciones sustanciales del software.
- *
- * EL SOFTWARE SE PROPORCIONA "TAL CUAL", SIN GARANTÍA DE NINGÚN TIPO, EXPRESA O IMPLÍCITA, INCLUIDAS,
- * ENTRE OTRAS, LAS GARANTÍAS DE COMERCIABILIDAD, IDONEIDAD PARA UN PROPÓSITO PARTICULAR Y NO INFRACCIÓN.
- * EN NINGÚN CASO LOS AUTORES O PROPIETARIOS DE DERECHOS DE AUTOR SERÁN RESPONSABLES DE CUALQUIER RECLAMO, 
- * DAÑO O CUALQUIER OTRO TIPO DE RESPONSABILIDAD, YA SEA EN UNA ACCIÓN CONTRACTUAL, AGRAVIO U OTRO, 
- * DERIVADOS, FUERA DEL USO DEL SOFTWARE O EL USO U OTRAS DISPOSICIONES DEL SOFTWARE.
- *
- * @package		JCore
- * @author		YisusCore
- * @link		https://jcore.jys.pe/
- * @version		1.0.1
- * @copyright	Copyright (c) 2018 - 2023, JYS Perú (https://www.jys.pe/)
+ * @link		https://jcore.jys.pe/files/JCore.php
+ * @version		1.0.0
  * @filesource
  */
 
-defined('EXECTIMESTART') or define('EXECTIMESTART', microtime(TRUE));
+/**
+ * Excute Time Start
+ *
+ * Indicate the exactly time what was loaded this file
+ * Used for BranchTimer
+ */
+$_ETS = microtime(TRUE);
 
 /**
  * DIRECTORY_SEPARATOR
@@ -43,21 +29,19 @@ defined('DS') or define('DS', DIRECTORY_SEPARATOR);
 /**
  * DIRECTORIO DEL SITIO
  *
- * Directorio Raiz de donde es leído el app
+ * Directorio Raiz de donde es accedido al sitio
  *
  * WARNING: No debe finalizar en DS (Directory Separator)
  *
  * @global
  */
-defined('HOMEPATH') or exit('<br /><b>Fatal Error:</b> La variable HOMEPATH no definida.');
+defined('HOMEPATH') or exit('<br /><b>Fatal Error:</b> La variable HOMEPATH no está definida.');
 
 /**
  * SUBDIRECTORIO DEL SITIO
  *
- * Subdirectorio donde se encuentra alojado el archivo init.php {@see init.php}
- *
- * Si variable SUBPATH se encuentra vacío entonces la aplicación se 
- * encuentra alojada en la misma carpeta del sitio.
+ * Subdirectorio donde se encuentra alojado los recursos del sitio 
+ * <i><small>(Recomendado cuando se aloja multiples sitios o plataformas en un mismo hosting)</small></i>
  *
  * WARNING: No debe finalizar pero si empezar con DS (Directory Separator)
  *
@@ -68,7 +52,7 @@ defined('SUBPATH') or define('SUBPATH', DS);
 /**
  * DIRECTORIO ABSOLUTO DEL SITIO
  *
- * Carpeta donde se encuentra alojado el init.php {@see init.php}
+ * Equivalente a <i>HOMEPATH</i>&nbsp;<b>.</b>&nbsp;<i>SUBPATH</i>
  *
  * @global
  */
@@ -77,8 +61,7 @@ defined('ABSPATH') or define('ABSPATH', realpath(HOMEPATH . SUBPATH));
 /**
  * DIRECTORIO NÚCLEO JCORE
  *
- * La variable contiene la ruta a la carpeta del núcleo JCore.
- * WARNING: No debe finalizar en DS (Directory Separator)
+ * Directorio de JCore PHP
  *
  * @internal
  */
@@ -87,21 +70,7 @@ define('ROOTPATH', __DIR__);
 /**
  * DIRECTORIO PROCESOS DE APLICACIÓN
  *
- * La variable contiene la ruta a la carpeta que contiene las 
- * funciones {@link https://jcore.jys.pe/functions}, 
- * configuraciones {@link https://jcore.jys.pe/configs}, 
- * objetos {@link https://jcore.jys.pe/objects}, 
- * procesadores {@link https://jcore.jys.pe/processers} y 
- * pantallas {@link https://jcore.jys.pe/displays} de la aplicación.
- *
- * *DIRECTORIOS EN LA CARPETA*
- * * functions, almacena todas los archivos de las funciones
- * * class, almacena todos los archivos de las clases
- * * libs, almacena todos los archivos de las librerías
- * * config, almacena todos los archivos que afectan a la configuración
- * * processors, almacena todos los archivos procesadores
- * * displays, almacena todos los archivos encargados de manipular el contenido del RESPONSE
- * * templates, almacena partes html/php de vistas repetibles
+ * Ruta a la carpeta que contiene los archivos para el APP
  *
  * WARNING: No debe finalizar en DS (Directory Separator)
  *
@@ -122,7 +91,7 @@ defined('APPPATH') or define('APPPATH',  ABSPATH);
  *
  * @global
  */
-defined('ENVIRONMENT') or define('ENVIRONMENT', 'desarrollo');
+defined('ENVIRONMENT') or define('ENVIRONMENT', 'pruebas');
 
 /**
  * ERROR REPORTING
@@ -144,16 +113,15 @@ switch (ENVIRONMENT)
 	default:
 		ini_set('display_errors', 1);
 		error_reporting(E_ALL & ~E_NOTICE);
-//		error_reporting(-1);
 	break;
 }
 
 /**
- * APP_NAMESPACE
+ * APPNMSP
  *
  * Un identificador sencillo de la aplicación que utiliza el núcleo JCore
  */
-defined('APP_NAMESPACE') or define('APP_NAMESPACE', 'JCore App');
+defined('APPNMSP') or define('APPNMSP', 'Another JCore App');
 
 /**
  * VARIABLE JCore
@@ -168,6 +136,13 @@ $JCore = [];
 $JC =& $JCore;
 
 /**
+ * VARIABLE $config
+ *
+ * @global
+ */
+isset($config) or $config = [];
+
+/**
  * DIRECTORIOS BASES
  *
  * Array de los directorios base que buscará las estructuras de archivos
@@ -175,6 +150,7 @@ $JC =& $JCore;
  * @internal
  */
 isset($BASES_path) or $BASES_path = [];
+$BASES_path = (array)$BASES_path;
 
 in_array(APPPATH, $BASES_path) or array_unshift($BASES_path, APPPATH);
 in_array(ROOTPATH, $BASES_path) or $BASES_path[] = ROOTPATH;
@@ -232,57 +208,7 @@ ob_start();
  */
 require_once ROOTPATH . DS . 'configs' . DS . 'functions' . DS . '@basic.php'; ## funciones básicas
 
-foreach($BASES_path as $basedir)
-{
-	if (isset($server_validation) and $server_validation)
-	{
-		/**
-		 * Creando Directorios Base
-		 * Valida que los diretorios principales hayan sido creados o los crea
-		 *
-		 * @internal
-		 */
-		
-		foreach(['displays', 'processors', 'objects', 'templates', 'configs'] as $dir)
-		{
-			mkdir2(DS . $dir, $basedir);
-		}
-		
-		foreach(['functions', 'classes', 'libs', 'translate'] as $dir)
-		{
-			mkdir2(DS . $dir, $basedir . DS . 'configs');
-		}
-	}
-
-	foreach ([
-		// Funciones Generales
-		'_variables',	## Funciones de conjuntos de Variables
-		'_mimes',		## Funciones y clase manipuladora de los mimes
-		'_validacion',	## Funciones de validación
-		'_security',	## Funciones de Seguridad
-
-		// Función Principal
-		'core',			## Funciones principales del núcleo
-
-		// Funciones Manipuladoras
-		'mngr.bbdd',	## Funciones manipuladores de las BBDDs
-		'mngr.vrbls',	## Funciones manipuladores de (Array, Date, Strings, Numerics)
-		'mngr.files',	## Funciones manipuladores de (Directory, Download, File)
-		'mngr.html',	## Funciones manipuladores de (Html)
-		'mngr.url',		## Funciones manipuladores de (URL)
-	] as $file_name)
-	{
-		$file = $basedir . DS . 'configs' . DS . 'functions' . DS . $file_name . '.php';
-
-		if ( ! file_exists($file))
-		{
-			isset($server_validation) and $server_validation and file_put_contents($file, '<?php' .PHP_EOL);
-			continue;
-		}
-
-		require_once $file;
-	}
-}
+wfile('core', 'functions');
 
 /**
  * DEFINIENDO EL HANDLER _autoload
@@ -322,13 +248,7 @@ register_shutdown_function('_shutdown_handler');
  *
  * @internal
  */
-foreach(array_reverse($BASES_path) as $basedir)
-{
-	if ($file = $basedir. DS. 'configs'. DS. 'hooks.php' and file_exists($file))
-	{
-		require_once $file;
-	}
-}
+wfile('hook', 'configs');
 
 /**
  * Marcando el punto de proceso `functions_loaded`
@@ -336,14 +256,7 @@ foreach(array_reverse($BASES_path) as $basedir)
  *
  * @internal
  */
-mark('functions_loaded');
-
-/**
- * Prioridad de WWW y HTTPS
- */
-redirect_default_www ();
-
-redirect_default_protocol ();
+mark('APP_prepared');
 
 /**
  * Inicializar el APP
@@ -351,17 +264,7 @@ redirect_default_protocol ();
  *
  * @internal
  */
-APP() -> init();
-
-/**
- * Inicializar Router
- */
-RTR()->init();
-
-/**
- * Imagen Service Slug
- */
-check_image_slug ();
+APP();
 
 /**
  * INICIANDO EL APP
@@ -369,14 +272,14 @@ check_image_slug ();
  * 
  * @see APP.php
  */
-if ( $file = APPPATH . DS . 'APP.php' and file_exists($file))
-{
-	require_once $file;
-}
+wfile('APP', '.', true);
 
 /**
  * APP\run()
  *
  * Función que procesa el request y emite un response
  */
-APP()->run();
+RQS()->valid();
+RQS()->process();
+
+RSP()->response();
