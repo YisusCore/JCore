@@ -873,6 +873,7 @@ if ( ! function_exists('logger'))
 		}
 		
 		}
+		
 		## Mostrar Log en Web
 		if ((display_errors() and $show) or isset($error_while_saving))
 		{
@@ -890,6 +891,30 @@ if ( ! function_exists('logger'))
 				unset($error);
 			}
 
+			
+			try
+			{
+				$RT = RSP()->responseType();
+
+				if (RSP()->isJson())
+				{
+					return RSP()
+						-> error($message)
+						-> addJson('logmsg', $message)
+						-> addJson('filepath', $filepath)
+						-> addJson('trace', $trace)
+					;
+				}
+			}
+			catch (\BasicException $e){}
+			catch (\Exception $e){}
+			catch (\TypeError $e){}
+			catch (\Error $e){}
+			finally
+			{
+				isset($RT) or $RT = 'HTML';
+			}
+			
 			if ($severity === 'Exception')
 			{
 				include @template('errors' . DS . 'exception.php', FALSE);

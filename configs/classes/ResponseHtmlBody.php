@@ -56,19 +56,31 @@ class ResponseHtmlBody
 		$content = $this->content;
 		$footer = $this->footer;
 
-		if ( ! empty($header))
+		if (is_callable($header))
+		{
+			$header = _o($header);
+		}
+		elseif ( ! empty($header))
 		{
 			$temp = @template($header);
 			is_null($temp) or $header = $temp;
 		}
 
-		if ( ! empty($content))
+		if (is_callable($content))
+		{
+			$content = _o($content);
+		}
+		elseif ( ! empty($content))
 		{
 			$temp = @template($content);
 			is_null($temp) or $content = $temp;
 		}
 
-		if ( ! empty($footer))
+		if (is_callable($footer))
+		{
+			$footer = _o($footer);
+		}
+		elseif ( ! empty($footer))
 		{
 			$temp = @template($footer);
 			is_null($temp) or $footer = $temp;
