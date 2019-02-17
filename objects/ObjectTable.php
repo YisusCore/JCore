@@ -125,7 +125,20 @@ class ObjectTable extends ArrayObject
 		
         $this->_repair_data();
 		
-		if (count($keys) === 0 or (count($keys) === 1 and is_empty($keys[0])))
+		if (count($keys) === 0)
+		{
+			return $this;
+		}
+		
+		do
+		{
+			$last = array_pop($keys);
+		}
+		while(is_null($last) and count($keys) > 0);
+		
+		is_null($last) or $keys[] = $last;
+		
+		if (count($keys) === 0)
 		{
 			return $this;
 		}
