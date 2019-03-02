@@ -174,7 +174,7 @@ $config['www'] = NULL;
  *
  * @global
  */
-$config['https'] = TRUE;
+$config['https'] = ! is_localhost();
 
 /**
  * allowed_http_methods
