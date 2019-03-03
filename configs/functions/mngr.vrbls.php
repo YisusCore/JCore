@@ -806,12 +806,12 @@ function date_recognize($date, $returnFormat = NULL){
 	if(is_null($returnFormat)){
 		$returnFormat = $this_format;
 	}
-	return date_($returnFormat, strtotime($date->format('Y-m-d H:i:s')));
+	return date2($returnFormat, strtotime($date->format('Y-m-d H:i:s')));
 }
 
 function diffdates($fecha_mayor='now_end', $fecha_menor='now', $possitive=true){
-    $fecha_mayor=date_($fecha_mayor);
-    $fecha_menor=date_($fecha_menor);
+    $fecha_mayor=date2($fecha_mayor);
+    $fecha_menor=date2($fecha_menor);
     
     $fecha_mayor = strtotime($fecha_mayor);
     $fecha_menor = strtotime($fecha_menor);
