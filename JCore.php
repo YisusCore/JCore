@@ -202,5 +202,50 @@ foreach($BASES_path as &$path)
 		exit(3); // EXIT_CONFIG
 	}
 	
+	if (isset($make_basic_directories) and $make_basic_directories)
+	{
+		$_dirs = [
+			'configs',
+			'configs/functions',
+			'configs/classes',
+			'configs/libs',
+			'configs/translate',
+			'configs/install.bbdd',
+			'response',
+			'response/structure',
+			'request',
+			'objects',
+		];
+		
+		foreach($_dirs as $_dir)
+		{
+			$_temp = $path . DS . $_dir;
+			
+			file_exists($_temp) or
+				mkdir($_temp);
+		}
 	}
 	
+	if (isset($make_basic_files) and $make_basic_files)
+	{
+		$_files = [
+			'configs/config.php',
+			'configs/hook.php',
+			'configs/install.bbdd/require.php',
+		];
+		
+		foreach($_files as $_file)
+		{
+			$_temp = $path . DS . $_file;
+			$_iphp = end((array)explode('.', $_temp)) === 'php';
+			
+			$_html = ($_iphp ? ('<?php' . PHP_EOL . '') : '') . '';
+			
+			file_exists($_temp) or
+				file_put_contents($_temp, $_html);
+		}
+	}
+	
+	unset($path, $_path);
+}
+
