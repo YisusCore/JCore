@@ -177,3 +177,30 @@ in_array(APPPATH, $BASES_path) or
 in_array(ROOTPATH, $BASES_path) or 
 	$BASES_path[] = ROOTPATH;
 
+/** Verificando las carpetas base */
+foreach($BASES_path as &$path)
+{
+	$_path = $path;
+	
+	if (($_temp = realpath($path)) !== FALSE)
+	{
+		$path = $_temp;
+	}
+	else
+	{
+		$path = strtr(
+			rtrim($path, '/\\'),
+			'/\\',
+			DS.DS
+		);
+	}
+	
+	if ( ! is_dir($path) || ! file_exists($path))
+	{
+		header('HTTP/1.1 503 Service Unavailable.', TRUE, 503);
+		echo 'El directorio `' . $_path . '` no es correcto o no existe.';
+		exit(3); // EXIT_CONFIG
+	}
+	
+	}
+	
