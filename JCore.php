@@ -39,3 +39,93 @@ $JC['ETS'] = microtime(TRUE);
   */
 $JC['EMS'] = memory_get_usage(TRUE);
 
+/**
+ * DIRECTORY_SEPARATOR
+ *
+ * Separador de Directorios para el sistema operativo de ejecución
+ *
+ * @global
+ */
+defined('DS') or 
+	define('DS', DIRECTORY_SEPARATOR);
+
+/**
+ * DIRECTORIO DEL SITIO
+ *
+ * Directorio Raiz de donde es accedido al sitio
+ *
+ * WARNING: No debe finalizar en DS (Directory Separator)
+ *
+ * @global
+ */
+defined('HOMEPATH') or 
+	exit('<br /><b>Fatal Error:</b> La variable HOMEPATH no está definida.');
+
+/**
+ * SUBDIRECTORIO DEL SITIO
+ *
+ * Subdirectorio donde se encuentra alojado los recursos del sitio 
+ * <i><small>(Recomendado cuando se aloja multiples sitios o plataformas en un mismo hosting)</small></i>
+ *
+ * WARNING: No debe finalizar pero si empezar con DS (Directory Separator)
+ *
+ * @global
+ */
+defined('SUBPATH') or 
+	define('SUBPATH', DS);
+
+/**
+ * DIRECTORIO ABSOLUTO DEL SITIO
+ *
+ * Equivalente a <i>HOMEPATH</i>&nbsp;<b>.</b>&nbsp;<i>SUBPATH</i>
+ *
+ * @global
+ */
+defined('ABSPATH') or 
+	define('ABSPATH', realpath(HOMEPATH . SUBPATH));
+
+/**
+ * DIRECTORIO NÚCLEO JCORE
+ *
+ * Directorio de JCore PHP
+ *
+ * @internal
+ */
+define('ROOTPATH', __DIR__);
+
+/**
+ * DIRECTORIO PROCESOS DE APLICACIÓN
+ *
+ * Ruta a la carpeta que contiene los archivos para el APP
+ *
+ * WARNING: No debe finalizar en DS (Directory Separator)
+ *
+ * @internal
+ */
+defined('APPPATH') or 
+	define('APPPATH',  ABSPATH);
+
+/**
+ * APPNMSP
+ *
+ * Un identificador sencillo de la aplicación que utiliza el núcleo JCore
+ */
+defined('APPNMSP') or 
+	define('APPNMSP', 'Another JCore App');
+
+/**
+ * ENVIRONMENT - AMBIENTE DE DESARROLLO
+ *
+ * Permite manejar distintas configuraciones dependientemente de 
+ * la etapa o fase en la que se encuentre la aplicación (proyecto)
+ *
+ * **Posibles valores:**
+ * *	desarrollo
+ * *	pruebas
+ * *	produccion
+ *
+ * @global
+ */
+defined('ENVIRONMENT') or 
+	define('ENVIRONMENT', 'pruebas');
+
