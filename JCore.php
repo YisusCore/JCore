@@ -249,3 +249,17 @@ foreach($BASES_path as &$path)
 	unset($path, $_path);
 }
 
+/**
+ * session_start
+ *
+ * Iniciando la sesión
+ */
+session_start();
+
+/**
+ * ob_start
+ *
+ * Iniciando el leído del buffering
+ */
+ob_start();
+
