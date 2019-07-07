@@ -237,7 +237,11 @@ foreach($BASES_path as &$path)
 		foreach($_files as $_file)
 		{
 			$_temp = $path . DS . $_file;
-			$_iphp = end((array)explode('.', $_temp)) === 'php';
+			
+			$_fext = explode('.', $_temp);
+			$_fext = end($_fext);
+			
+			$_iphp = $_fext === 'php';
 			
 			$_html = ($_iphp ? ('<?php' . PHP_EOL . '') : '') . '';
 			
