@@ -18,3 +18,9 @@
 isset($JC) or
 	$JC = [];
 
+/** 
+ * Corrigiendo directorio base cuando se ejecuta como comando
+ */
+defined('STDIN') and 
+	chdir(APPPATH);
+
