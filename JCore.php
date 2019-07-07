@@ -159,3 +159,21 @@ switch (ENVIRONMENT)
 	break;
 }
 
+/**
+ * DIRECTORIOS BASES
+ *
+ * Array de los directorios base que buscará las estructuras de archivos
+ *
+ * @internal
+ */
+isset($BASES_path) or 
+	$BASES_path = [];
+
+$BASES_path = (array)$BASES_path;
+
+in_array(APPPATH, $BASES_path) or 
+	array_unshift($BASES_path, APPPATH);
+
+in_array(ROOTPATH, $BASES_path) or 
+	$BASES_path[] = ROOTPATH;
+
