@@ -81,6 +81,11 @@ if ( ! function_exists('mkdir2'))
 					break;
 				}
 			}
+			
+			if ($base === DS)
+			{
+				throw new Exception("BASE PATH no puede ser /");
+			}
 		}
 		
 		$folder = preg_replace('/^' . regex($base) . '/i', '', $folder);

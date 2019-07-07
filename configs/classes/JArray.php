@@ -31,23 +31,23 @@ class JArray extends ArrayObject
 	
 	public function __isset ($index)
 	{
-		return $this->offsetExists($index);
+		return $this -> offsetExists($index);
 	}
 
 	public function __get ($index)
 	{
-		return $this->offsetGet($index);
+		return $this -> offsetGet($index);
 	}
 
 	public function __set ($index, $newval)
 	{
-		$this->offsetSet($index, $newval);
+		$this -> offsetSet($index, $newval);
 		return $this;
 	}
 
 	public function __unset ($index)
 	{
-		$this->offsetUnset($index);
+		$this -> offsetUnset($index);
 		return $this;
 	}
 }

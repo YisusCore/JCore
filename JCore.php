@@ -1,4 +1,5 @@
 <?php
+
 /**
  * JCore.php
  * 
@@ -16,6 +17,13 @@
  * Used for BranchTimer
  */
 $_ETS = microtime(TRUE);
+
+/**
+ * Excute Memory Start
+ *
+ * Indicate the exactly memory what was loaded this file
+  */
+$_EMS = memory_get_usage(TRUE);
 
 /**
  * DIRECTORY_SEPARATOR
@@ -208,7 +216,29 @@ ob_start();
  */
 require_once ROOTPATH . DS . 'configs' . DS . 'functions' . DS . '@basic.php'; ## funciones básicas
 
-wfile('core', 'functions');
+/**
+ * LEYENDO archivos de funciones
+ */
+foreach([
+	// Funciones Generales
+	'_variables',	## Funciones de conjuntos de Variables
+	'_mimes',		## Funciones y clase manipuladora de los mimes
+	'_validacion',	## Funciones de validación
+	'_security',	## Funciones de Seguridad
+	
+	// Función Principal
+	'core',			## Funciones principales del núcleo
+	
+	// Funciones Manipuladoras
+	'mngr.bbdd',	## Funciones manipuladores de las BBDDs
+	'mngr.vrbls',	## Funciones manipuladores de (Array, Date, Strings, Numerics)
+	'mngr.files',	## Funciones manipuladores de (Directory, Download, File)
+	'mngr.html',	## Funciones manipuladores de (Html)
+	'mngr.url',		## Funciones manipuladores de (URL)
+] as $func)
+{
+	wfile($func, 'functions');
+}
 
 /**
  * DEFINIENDO EL HANDLER _autoload
@@ -273,7 +303,7 @@ APP();
  * @see APP.php
  */
 wfile('APP', '.', true);
-
+var_dump(memory_get_usage(true) - $_EMS, __LINE__);
 /**
  * APP\run()
  *
