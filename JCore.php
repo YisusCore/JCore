@@ -25,6 +25,11 @@ defined('STDIN') and
 	chdir(APPPATH);
 
 /**
+ * Definiendo Variables
+ */
+{
+
+/**
  * Excute Time Start
  *
  * Indicate the exactly time what was loaded this file
@@ -128,4 +133,6 @@ defined('APPNMSP') or
  */
 defined('ENVIRONMENT') or 
 	define('ENVIRONMENT', 'pruebas');
+
+}
 
