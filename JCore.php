@@ -263,3 +263,11 @@ session_start();
  */
 ob_start();
 
+/**
+ * Cargando Archivo de Funciones básicas
+ * El archivo @basic.php contiene todas las funciones básicas a utilizar en el sistema
+ *
+ * @internal
+ */
+require_once ROOTPATH . DS . 'configs' . DS . 'functions' . DS . '@basic.php'; ## funciones básicas
+
