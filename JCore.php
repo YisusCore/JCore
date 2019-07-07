@@ -6,3 +6,15 @@
  * @filesource
  */
 
+/**
+ * VARIABLE JCore
+ *
+ * Variable global que permite almacenar valores y datos de manera global 
+ * sin necesidad de almacenarlo en una sesión u otra variable posiblemente 
+ * no existente
+ *
+ * @global
+ */
+isset($JC) or
+	$JC = [];
+
