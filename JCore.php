@@ -201,7 +201,7 @@ foreach($BASES_path as &$path)
 		echo 'El directorio `' . $_path . '` no es correcto o no existe.';
 		exit(3); // EXIT_CONFIG
 	}
-	
+
 	if (isset($make_basic_directories) and $make_basic_directories)
 	{
 		$_dirs = [
@@ -232,6 +232,7 @@ foreach($BASES_path as &$path)
 			'configs/config.php',
 			'configs/hook.php',
 			'configs/install.bbdd/require.php',
+			'APP.php',
 		];
 		
 		foreach($_files as $_file)
