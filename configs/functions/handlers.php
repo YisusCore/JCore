@@ -55,3 +55,33 @@ if ( ! function_exists('_error_handler'))
 	}
 }
 
+if ( ! function_exists('_exception_handler'))
+{
+	/**
+	 * _exception_handler()
+	 * Función a ejecutar cuando se produzca una exception
+	 *
+	 * @use logger
+	 * @use is_cli
+	 *
+	 * @param	Exception	$exception
+	 *
+	 * @return	void
+	 */
+	function _exception_handler($exception)
+	{
+		// Ya que es una exception, se retorna un status 500 Internal Server Error
+		if ( ! is_cli())
+		{
+			http_response_code(500);
+		}
+		
+		// Se envía los datos a una función especial llamada logger definida por el usuario
+		function_exists('logger') and
+		logger($exception);
+		
+		// Ya que es una exception, finaliza el proceso
+		exit(1);
+	}
+}
+
