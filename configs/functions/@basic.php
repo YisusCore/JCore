@@ -192,3 +192,28 @@ if ( ! function_exists('is_cli'))
 	}
 }
 
+if ( ! function_exists('display_errors'))
+{
+	/**
+	 * display_errors()
+	 * Identificar si la aplicación debe mostrar los errores o los logs
+	 * 
+	 * Se puede cambiar el valor durante la ejecución
+	 *
+	 * @param bool|NULL $set Si es Bool entonces asigna al valor mediante ejecución
+	 * @return bool
+	 */
+	function &display_errors(bool $set = NULL)
+	{
+		static $display_errors = []; ## No puede ser referenciado si es BOOL
+		
+		count($display_errors) === 0 and
+			$display_errors[0] = (bool)str_ireplace(array('off', 'none', 'no', 'false', 'null'), '', @ini_get('display_errors'));
+		
+		is_bool($set) and 
+			$display_errors[0] = $set;
+		
+		return $display_errors[0];
+	}
+}
+
