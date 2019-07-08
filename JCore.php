@@ -345,6 +345,15 @@ $_handler = '_shutdown_handler' and
 @load_file('configs/hook.php');
 
 /**
+ * LEYENDO LOS AUTOLOADS DE LAS LIBRERÍAS
+ * Busca el archivo autoload.php de la carpeta libs en configs
+ * Estos archivos pueden registrar mas autoloads para identificar las clases como librerias
+ *
+ * @internal
+ */
+@load_file('configs/libs/autoload.php');
+
+/**
  * Marcando el punto de proceso `functions_loaded`
  * @see mark()
  *
