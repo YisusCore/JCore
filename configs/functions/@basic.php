@@ -178,5 +178,17 @@ if ( ! function_exists('load_file'))
 	}
 }
 
-
+if ( ! function_exists('is_cli'))
+{
+	/**
+	 * is_cli()
+	 * Identifica si el REQUEST ha sido hecho desde comando de linea
+	 *
+	 * @return bool
+	 */
+	function is_cli()
+	{
+		return (PHP_SAPI === 'cli' OR defined('STDIN'));
+	}
+}
 
