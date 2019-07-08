@@ -80,7 +80,7 @@ if ( ! function_exists('_exception_handler'))
 		// Se envía los datos a una función especial llamada logger definida por el usuario
 		function_exists('logger') and
 		logger($exception);
-		
+
 		// Ya que es una exception, finaliza el proceso
 		exit(1);
 	}
