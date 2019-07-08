@@ -86,3 +86,35 @@ if ( ! function_exists('_exception_handler'))
 	}
 }
 
+if ( ! function_exists('_shutdown_handler'))
+{
+	/**
+	 * _shutdown_handler()
+	 * Función a ejecutar antes de finalizar el procesamiento de la aplicación
+	 *
+	 * @use _error_handler
+	 * @use action_apply
+	 *
+	 * @return void
+	 */
+	function _shutdown_handler()
+	{
+		// Validar si se produjo la finalización por un error
+		$last_error = error_get_last();
+		
+		if ( isset($last_error) &&
+			($last_error['type'] & (E_ERROR | E_PARSE | E_CORE_ERROR | E_CORE_WARNING | E_COMPILE_ERROR | E_COMPILE_WARNING)))
+		{
+			_error_handler($last_error['type'], $last_error['message'], $last_error['file'], $last_error['line']);
+		}
+		
+		if (function_exists('action_apply'))
+		{
+			// Ejecutando funciones programadas
+			action_apply ('do_when_end');
+			action_apply ('shutdown');
+		}
+		
+		flush();
+	}
+}
