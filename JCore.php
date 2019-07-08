@@ -343,3 +343,12 @@ $_handler = '_shutdown_handler' and
  * @internal
  */
 @load_file('configs/hook.php');
+
+/**
+ * Marcando el punto de proceso `functions_loaded`
+ * @see mark()
+ *
+ * @internal
+ */
+@mark('APP_prepared');
+
