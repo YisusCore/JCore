@@ -242,3 +242,36 @@ if ( ! function_exists('is_localhost'))
 	}
 }
 
+if ( ! function_exists('protect_server_dirs'))
+{
+	/**
+	 * protect_server_dirs()
+	 * Proteje los directorios base y los reemplaza por vacío o un parametro indicado
+	 *
+	 * @since 1.1 Se cambio la carga de directorios en la variable $_dirs a los de la variable $BASES_path
+	 * @since 1.0
+	 *
+	 * @param string $str Contenido que probablemente contiene rutas a proteger
+	 * @return string
+	 */
+	function protect_server_dirs(string $str)
+	{
+		static $_dirs = [];
+
+		global $BASES_path;
+
+		$add_basespath = count($_dirs) === 0;
+
+		defined('ROOTPATH') and ! isset($_dirs[ROOTPATH]) and $_dirs[ROOTPATH] = DS . 'ROOTPATH';
+		defined('APPPATH')  and ! isset($_dirs[APPPATH])  and $_dirs[APPPATH]  = DS . 'APPPATH';
+		defined('ABSPATH')  and ! isset($_dirs[ABSPATH])  and $_dirs[ABSPATH]  = DS . 'ABSPATH';
+		defined('HOMEPATH') and ! isset($_dirs[HOMEPATH]) and $_dirs[HOMEPATH] = DS . 'HOMEPATH';
+
+		$add_basespath and 
+		$_dirs = array_merge(array_combine($BASES_path, array_map(function($path){
+			return DS . basename($path);
+		}, $BASES_path)), $_dirs);
+
+		return strtr($str, $_dirs);
+	}
+}
