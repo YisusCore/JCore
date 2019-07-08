@@ -36,9 +36,11 @@ if ( ! function_exists('load_file'))
 	 * @param $file string Archivo a leer
 	 * @param $first_founded_only boolean (Optional) Si se requiere solo obtener el primer archivo encontrado
 	 * @param $return_list boolean (Optional) Si se desea obtener el listado pero no requerir los archivos
-	 * @param $function string (include\require) Que función ejecutar para requerir el archivo
+	 * @param $function string (include|require) Que función ejecutar para requerir el archivo
 	 * @param $once boolean (Optional) Si se desea que la función a ejecuta sea _once
 	 * @param $scandir_sorting_order boolean (Optional) Si se desea que la función a ejecuta sea _once
+	 *
+	 * @return array|void
 	 */
 	function load_file ($file, $first_founded_only = FALSE, $return_list = FALSE, $function = 'include', $once = TRUE, $scandir_sorting_order = SCANDIR_SORT_NONE)
 	{
