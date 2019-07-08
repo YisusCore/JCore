@@ -33,12 +33,12 @@ if ( ! function_exists('load_file'))
 	 *
 	 * Permite leer y requerir los archivos encontrados de todos los directorios 
 	 *
-	 * @param $file string Archivo a leer
-	 * @param $first_founded_only boolean (Optional) Si se requiere solo obtener el primer archivo encontrado
-	 * @param $return_list boolean (Optional) Si se desea obtener el listado pero no requerir los archivos
-	 * @param $function string (include|require) Que función ejecutar para requerir el archivo
-	 * @param $once boolean (Optional) Si se desea que la función a ejecuta sea _once
-	 * @param $scandir_sorting_order boolean (Optional) Si se desea que la función a ejecuta sea _once
+	 * @param string $file Archivo a leer
+	 * @param boolean $first_founded_only (Optional) Si se requiere solo obtener el primer archivo encontrado
+	 * @param boolean $return_list (Optional) Si se desea obtener el listado pero no requerir los archivos
+	 * @param string $function (include|require) Que función ejecutar para requerir el archivo
+	 * @param boolean $once (Optional) Si se desea que la función a ejecuta sea _once
+	 * @param boolean $scandir_sorting_order (Optional) Si se desea que la función a ejecuta sea _once
 	 *
 	 * @return array|void
 	 */
