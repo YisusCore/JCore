@@ -81,3 +81,20 @@ if ( ! function_exists('print_array'))
 	}
 }
 
+if ( ! function_exists('die_array'))
+{
+	/**
+	 * die_array()
+	 * Muestra los contenidos enviados en el parametro para mostrarlos en HTML y finaliza los segmentos
+	 *
+	 * @use print_array
+	 *
+	 * @param	...array
+	 * @return	void
+	 */
+	function die_array(...$array)
+	{
+		call_user_func_array('print_array', $array);
+		die();
+	}
+}
