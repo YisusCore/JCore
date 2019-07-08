@@ -12,6 +12,8 @@ if ( ! function_exists('_error_handler'))
 	 * _error_handler()
 	 * Función a ejecutar al producirse un error durante la aplicación
 	 *
+	 * @use logger
+	 *
 	 * @param string
 	 * @param string
 	 * @param string
