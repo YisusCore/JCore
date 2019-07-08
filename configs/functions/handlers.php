@@ -119,3 +119,30 @@ if ( ! function_exists('_shutdown_handler'))
 	}
 }
 
+if ( ! function_exists('_autoload'))
+{
+	/**
+	 * _autoload()
+	 * Función a ejecutar para leer una clase que aún no ha sido declarada
+	 * 
+	 * Las clases con namespace 	"Request" 		son buscados dentro de la carpeta 		"/request"
+	 * Las clases con namespace 	"Response" 		son buscados dentro de la carpeta 		"/response"
+	 * Las clases con namespace 	"Object" 		son buscados dentro de la carpeta 		"/objects"
+	 *
+	 * Las clases con namespace "Response" y sufijo "Structure" son buscados dentro de la carpeta 		"/response/structure"
+	 *
+	 * Se busca en las carpetas configs/classes.
+	 *
+	 * Las clases con sufijo 		"Exception" 	también son buscados dentro de la carpeta 		"/configs/classes/exceptions"
+	 * Las clases con sufijo 		"Object" 		también son buscados dentro de la carpeta 		"/objects"
+	 *
+	 * Las clase "Object" también es buscado dentro de la carpeta 		"/objects"
+	 *
+	 * @param string $class
+	 * @return void
+	 */
+	function _autoload($class)
+	{
+		
+	}
+}
