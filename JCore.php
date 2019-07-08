@@ -291,3 +291,55 @@ ob_start();
  */
 require_once ROOTPATH . DS . 'configs' . DS . 'functions' . DS . '@basic.php'; ## funciones básicas
 
+/**
+ * LEYENDO archivos de funciones
+ */
+load_file('functions/*');
+
+/**
+ * DEFINIENDO EL HANDLER _autoload
+ * @see _autoload()
+ *
+ * @internal
+ */
+$_handler = '_autoload' and
+	function_exists($_handler) and 
+	spl_autoload_register($_handler);
+
+/**
+ * DEFINIENDO EL HANDLER _error_handler
+ * @see _error_handler()
+ *
+ * @internal
+ */
+$_handler = '_error_handler' and
+	function_exists($_handler) and 
+	set_error_handler($_handler);
+
+/**
+ * DEFINIENDO EL HANDLER _exception_handler
+ * @see _exception_handler()
+ *
+ * @internal
+ */
+$_handler = '_exception_handler' and
+	function_exists($_handler) and 
+	set_exception_handler('_exception_handler');
+
+/**
+ * DEFINIENDO EL HANDLER _shutdown_handler
+ * @see _shutdown_handler()
+ *
+ * @internal
+ */
+$_handler = '_shutdown_handler' and
+	function_exists($_handler) and 
+	register_shutdown_function($_handler);
+
+/**
+ * LEYENDO LOS HOOKS (Acciones programadas)
+ * Lee todas las acciones programadas
+ *
+ * @internal
+ */
+@load_file('configs/hook.php');
