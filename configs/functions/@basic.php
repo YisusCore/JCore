@@ -217,3 +217,28 @@ if ( ! function_exists('display_errors'))
 	}
 }
 
+if ( ! function_exists('is_localhost'))
+{
+	/**
+	 * is_localhost()
+	 * Identificar si la aplicación está corriendo en modo local
+	 *
+	 * Se puede cambiar el valor durante la ejecución
+	 *
+	 * @param bool|NULL $set Si es Bool entonces asigna al valor mediante ejecución
+	 * @return bool
+	 */
+	function &is_localhost(bool $set = NULL)
+	{
+		static $is_localhost = []; ## No puede ser referenciado si es BOOL
+
+		count($is_localhost) === 0 and
+		$is_localhost[0] = (bool)preg_match('/^(192\.168\.[0-9]{1,3}\.[0-9]{1,3}|127\.[0]{1,3}\.[0]{1,3}\.[0]{0,2}1)$/', $_SERVER['SERVER_ADDR']);
+
+		is_bool($set) and 
+		$is_localhost[0] = $set;
+
+		return $is_localhost[0];
+	}
+}
+
