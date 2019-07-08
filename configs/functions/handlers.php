@@ -13,6 +13,7 @@ if ( ! function_exists('_error_handler'))
 	 * Función a ejecutar al producirse un error durante la aplicación
 	 *
 	 * @use logger
+	 * @use is_cli
 	 *
 	 * @param string
 	 * @param string
@@ -26,7 +27,7 @@ if ( ! function_exists('_error_handler'))
 		// Se valida si es error o solo una alerta
 		$_error = (((E_ERROR | E_PARSE | E_COMPILE_ERROR | E_CORE_ERROR | E_USER_ERROR) & $severity) === $severity);
 
-		if ($_error)
+		if ($_error and ! is_cli())
 		{
 			// Ya que es un error, se retorna un status 500 Internal Server Error
 			http_response_code(500);
