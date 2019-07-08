@@ -254,6 +254,21 @@ foreach($BASES_path as &$path)
 	unset($path, $_path);
 }
 
+if (isset($make_basic_files) and $make_basic_files)
+{
+	$_temp = ABSPATH . DS . '.htaccess';
+	$_html = '';
+	$_html.= '<IfModule mod_rewrite.c>' . PHP_EOL;
+	$_html.= '    RewriteEngine on' . PHP_EOL;
+	$_html.= '    RewriteRule ^index\.php$ - [L]' . PHP_EOL;
+	$_html.= '    RewriteCond %{REQUEST_FILENAME} !-f' . PHP_EOL;
+	$_html.= '    Rewriterule . index.php [L]' . PHP_EOL;
+	$_html.= '</IfModule>' . PHP_EOL;
+	
+	file_exists($_temp) or
+		file_put_contents($_temp, $_html);
+}
+
 /**
  * session_start
  *
