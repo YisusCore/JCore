@@ -74,7 +74,7 @@ if ( ! function_exists('print_array'))
 				$_arr = htmlentities(print_r($_arr, true));
 			}
 			
-			$r.= ($ind > 0 ? '<hr style="border: none;border-top: dashed #ebebeb .5px;margin: 12px 0;">' : '') . $_arr;
+			$r.= ($ind > 0 ? '<hr style="border: none;border-top: dashed #ebebeb '.($ind % 2 === 0 ? '1' : '').'.5px;margin: 12px 0;">' : '') . $_arr;
 		}
 
 		echo '<pre style="display: block;text-align: left;color: #444;background: white;position: relative;z-index: 99999999999;margin: 5px 5px 15px;padding: 0px 10px 10px;border: solid 1px #ebebeb;box-shadow: 4px 4px 4px rgba(235, 235, 235, .5);">' . $file_line . $r . '</pre>' . PHP_EOL;
