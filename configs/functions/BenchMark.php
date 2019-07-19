@@ -42,8 +42,11 @@ if ( ! class_exists('BenchMark'))
 			$this->position = 0;
 
 			global $JC;
-			
+
 			$this->points['total_execution_time_start'] = $JC['ETS'];
+
+			defined('BMK_loaded') or
+			define('BMK_loaded', TRUE);
 		}
 		
 		//-------------------------------------------
