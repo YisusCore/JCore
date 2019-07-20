@@ -361,3 +361,20 @@ $_handler = '_shutdown_handler' and
  */
 @mark('APP_prepared');
 
+/**
+ * Inicializar el APP
+ * Permite inicializar la clase APP y todo las configuraciones
+ *
+ * @internal
+ */
+APP();
+
+/**
+ * Procesa el REQUEST
+ */
+RQS();
+
+/**
+ * Procesa el RESPONSE
+ */
+RSP();
