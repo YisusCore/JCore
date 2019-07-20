@@ -182,6 +182,8 @@ if ( ! function_exists('load_file'))
 					
 			}
 		}
+		
+		return count($lista);
 	}
 }
 
