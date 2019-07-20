@@ -6,6 +6,42 @@
  * @filesource
  */
 
+/**
+ * DIRECTORY_SEPARATOR
+ *
+ * Separador de Directorios para el sistema operativo de ejecución
+ *
+ * @global
+ */
+defined('DS') or 
+	define('DS', DIRECTORY_SEPARATOR);
+
+/**
+ * ENVIRONMENT - AMBIENTE DE DESARROLLO
+ *
+ * Permite manejar distintas configuraciones dependientemente de 
+ * la etapa o fase en la que se encuentre la aplicación (proyecto)
+ *
+ * **Posibles valores:**
+ * *	desarrollo
+ * *	pruebas
+ * *	produccion
+ *
+ * @global
+ */
+defined('ENVIRONMENT') or 
+	define('ENVIRONMENT', 'pruebas');
+
+/**
+ * DIRECTORIOS BASES
+ *
+ * Array de los directorios base que buscará las estructuras de archivos
+ *
+ * @internal
+ */
+isset($BASES_path) or 
+	$BASES_path = [];
+
 if ( ! function_exists('_error_handler'))
 {
 	/**
@@ -130,6 +166,8 @@ if ( ! function_exists('_autoload'))
 	 * Las clases con namespace 	"Object" 		son buscados dentro de la carpeta 		"/objects"
 	 *
 	 * Las clases con namespace "Response" y sufijo "Structure" son buscados dentro de la carpeta 		"/response/structure"
+	 *  	\Response\BasicStructure
+	 *  	\Response\Structure\Basic
 	 *
 	 * Se busca en las carpetas configs/classes.
 	 *
@@ -138,10 +176,10 @@ if ( ! function_exists('_autoload'))
 	 *
 	 * Las clase "Object" también es buscado dentro de la carpeta 		"/objects"
 	 *
-	 * @param string $class
+	 * @param string $main_class
 	 * @return void
 	 */
-	function _autoload($class)
+	function _autoload($main_class)
 	{
 		
 	}
