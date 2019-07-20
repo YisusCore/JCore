@@ -64,6 +64,9 @@ if ( ! function_exists('load_file'))
 		// Unimos el directorio y corregimos el DS inicial (si es que hay)
 		$file_dir = DS . ltrim(implode(DS, $file_dir), DS);
 		
+		$file_dir === DS and
+		$file_dir = '';
+		
 		// Si se requiere obtener todo el listado archivos en el directorio buscado
 		$all_files_of_dir = $file === '*';
 
@@ -133,6 +136,8 @@ if ( ! function_exists('load_file'))
 					}
 					
 					$_temp = $_temp_path . DS . $_file;
+					
+					file_exists($_temp) and
 					$lista[] = $_temp;
 				}
 				
@@ -140,6 +145,8 @@ if ( ! function_exists('load_file'))
 			}
 			
 			$_temp = $_temp_path . DS . $file;
+			
+			file_exists($_temp) and
 			$lista[] = $_temp;
 		}
 		
