@@ -8,7 +8,7 @@
 
 class JArray extends ArrayObject
 {
-	private $_callbacks;
+	protected $_callbacks;
 
     public function __construct($data = [], $callbacks = [])
     {
