@@ -181,6 +181,162 @@ if ( ! function_exists('_autoload'))
 	 */
 	function _autoload($main_class)
 	{
+		static $bcs = '\\';
+		/**
+		 * $class_structure
+		 * Convirtiendo la clase como array
+		 */
+		$class_structure = explode($bcs, $main_class);
 		
+		/**
+		 * $start_ws
+		 * Identificar si han llamado a la clase como \ (backslash)
+		 */
+		$start_ws = FALSE;
+		
+		empty($class_structure[0]) and 
+		$start_ws = TRUE and 
+		array_shift($class_structure);
+		
+		/**
+		 * $main_dir
+		 * 
+		 */
+		$main_dir = '';
+		
+		/**
+		 * $alter_dir
+		 * 
+		 */
+		$alter_dir = '';
+		
+		/**
+		 * $alter_class
+		 * 
+		 */
+		$alter_class = '';
+		
+		if (count($class_structure) > 1)
+		{
+			$_namespace = array_shift($class_structure);
+			
+			$_class = array_shift($class_structure);
+			
+			switch($_namespace)
+			{
+				case 'Request':case 'Response':
+					$main_dir = DS . mb_strtolower($_namespace);
+					break;
+				case 'Object':
+					$main_dir = DS . mb_strtolower($_namespace) . 's';
+					break;
+			}
+			
+			if ($_namespace === 'Response' and preg_match('/(.+)Structure$/', $_class))
+			{
+				$main_dir.= DS . 'structure';
+				$alter_class = $bcs . 'Response' . $bcs . 'Structure' . $bcs . preg_replace('/Structure$/', '', $_class);
+				
+				count($class_structure) > 0 and
+				$alter_class .= $bcs . implode($bcs, $class_structure);
+			}
+			
+			array_unshift($class_structure, $_class);
+			array_unshift($class_structure, $_namespace);
+		}
+		
+		empty($main_dir) and
+		$main_dir = DS . 'configs' . DS . 'classes';
+		
+		$_class = array_shift($class_structure);
+		
+		if (preg_match('/(.+)Exception/', $_class))
+		{
+			$alter_class = DS . 'configs' . DS . 'classes' . DS . 'exceptions';
+		}
+		
+		if (preg_match('/(.+)Object/', $_class) or $_class === 'Object')
+		{
+			$alter_class = DS . 'objects';
+		}
+		
+		array_unshift($class_structure, $_class);
+		
+		global $BASES_path;
+		
+		$main_class_file = strtr($main_class, $bcs, DS) . '.php';
+		
+		$alter_class_file = '';
+		
+		! empty($alter_class) and
+		$alter_class_file = strtr($alter_class, $bcs, DS) . '.php' and
+		$alter_class = $main_class;
+		
+		foreach($BASES_path as $_path)
+		{
+			if ($_file = $_path . $main_dir . DS . ENVIRONMENT . DS . $main_class_file and file_exists($_file))
+			{
+				if (class_exists($main_class, FALSE) === FALSE and class_exists($alter_class, FALSE) === FALSE)
+				{
+					require_once $_file;
+				}
+			}
+			
+			if ( ! empty($alter_dir) and $_file = $_path . $alter_dir . DS . ENVIRONMENT . DS . $main_class_file and file_exists($_file))
+			{
+				if (class_exists($main_class, FALSE) === FALSE and class_exists($alter_class, FALSE) === FALSE)
+				{
+					require_once $_file;
+				}
+			}
+			
+			if ( ! empty($alter_class_file) and $_file = $_path . $main_dir . DS . ENVIRONMENT . DS . $alter_class_file and file_exists($_file))
+			{
+				if (class_exists($alter_class, FALSE) === FALSE and class_exists($alter_class, FALSE) === FALSE)
+				{
+					require_once $_file;
+				}
+			}
+			
+			if ( ! empty($alter_class_file) and  ! empty($alter_dir) and $_file = $_path . $alter_dir . DS . ENVIRONMENT . DS . $alter_class_file and file_exists($_file))
+			{
+				if (class_exists($alter_class, FALSE) === FALSE and class_exists($alter_class, FALSE) === FALSE)
+				{
+					require_once $_file;
+				}
+			}
+			
+			if ($_file = $_path . $main_dir . DS . $main_class_file and file_exists($_file))
+			{
+				if (class_exists($main_class, FALSE) === FALSE and class_exists($alter_class, FALSE) === FALSE)
+				{
+					require_once $_file;
+				}
+			}
+			
+			if ( ! empty($alter_dir) and $_file = $_path . $alter_dir . DS . $main_class_file and file_exists($_file))
+			{
+				if (class_exists($main_class, FALSE) === FALSE and class_exists($alter_class, FALSE) === FALSE)
+				{
+					require_once $_file;
+				}
+			}
+			
+			if ( ! empty($alter_class_file) and $_file = $_path . $main_dir . DS . $alter_class_file and file_exists($_file))
+			{
+				if (class_exists($alter_class, FALSE) === FALSE and class_exists($alter_class, FALSE) === FALSE)
+				{
+					require_once $_file;
+				}
+			}
+			
+			if ( ! empty($alter_class_file) and  ! empty($alter_dir) and $_file = $_path . $alter_dir . DS . $alter_class_file and file_exists($_file))
+			{
+				if (class_exists($alter_class, FALSE) === FALSE and class_exists($alter_class, FALSE) === FALSE)
+				{
+					require_once $_file;
+				}
+			}
+		}
 	}
 }
