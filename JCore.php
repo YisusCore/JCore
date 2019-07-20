@@ -370,6 +370,14 @@ $_handler = '_shutdown_handler' and
 APP();
 
 /**
+ * INICIANDO EL APP
+ * El app permite cambiar configuraciones o agregar cambios antes de  procesar el REQUEST para emitir un RESPONSE.
+ * 
+ * @see APP.php
+ */
+load_file('APP.php');
+
+/**
  * Procesa el REQUEST
  */
 RQS();
