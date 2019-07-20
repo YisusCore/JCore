@@ -338,5 +338,7 @@ if ( ! function_exists('_autoload'))
 				}
 			}
 		}
+		
+		class_exists($main_class, FALSE) === FALSE and class_exists($alter_class , FALSE) === TRUE and class_alias($alter_class , $main_class);
 	}
 }
