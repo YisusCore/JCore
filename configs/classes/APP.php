@@ -63,6 +63,18 @@ class APP extends JArray
 			
 			## Estableciendo el timezone a todo lo que corresponde
 			date_default_timezone_set($timezone);
+
+			global $CONs;
+
+			if (is_empty($CONs))
+			{
+				return;
+			}
+
+			foreach($CONs as $CON)
+			{
+				@mysqli_query($CON, 'SET time_zone = ' . qp_esc(getUTC()));
+			}
 		};
 
 		$this->_callbacks['get_timezone'] = function (&$return)
@@ -85,6 +97,12 @@ class APP extends JArray
 		
 		$this['lang'] = $this->_config['lang'];
 		
+		/**
+		 * Conectar Primera Base Datos
+		 */
+		sql_start();
+		
+		load_file(DS . 'configs' . DS . 'install.bbdd' . DS . 'require.php');
 		
 	}
 	
