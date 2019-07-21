@@ -49,6 +49,53 @@ class JArray extends ArrayObject
 
 		return $return;
     }
+	
+	/**
+     * __call ()
+     */
+    public function __call ($name, $args)
+    {
+        if (preg_match('#^set_(.+)#', $name))
+        {
+        	$index = preg_replace('#^set_#', '', $name);
+        	return $this->__set($index, $args[0]);
+        }
+
+        if (preg_match('#^get_(.+)#', $name))
+        {
+        	$index = preg_replace('#^get_#', '', $name);
+        	return $this->__get($index);
+        }
+		
+		trigger_error('Call to undefined method ' . get_called_class() . '::' . $name . '()', E_USER_ERROR);
+		
+        return $this;
+    }
+
+    /**
+     * __invoke ()
+     */
+    public function __invoke()
+    {
+		$_args = func_get_args();
+		
+		$_args[] = NULL;
+		$_args[] = NULL;
+		
+		list($index, $newval) = $_args;
+		
+		if (is_null($index))
+		{
+			return $this->__toArray();
+		}
+		
+		if (is_null($newval))
+		{
+			return $this->__get($index);
+		}
+		
+        return $this->__set($index, $newval);
+    }
 
 	//-------------------------------------------
 	// Object Access
@@ -117,10 +164,16 @@ class JArray extends ArrayObject
 		isset($this->_callbacks['before_get']) and
 		$this->_callbacks['before_get']($index, $this);
 		
+		isset($this->_callbacks['before_get_' . $index]) and
+		$this->_callbacks['before_get_' . $index]($index, $this);
+		
 		$return = parent::offsetGet($index);
 		
 		isset($this->_callbacks['get']) and
 		$this->_callbacks['get']($return, $index, $this);
+		
+		isset($this->_callbacks['get_' . $index]) and
+		$this->_callbacks['get_' . $index]($return, $index, $this);
 		
 		isset($this->_callbacks[__FUNCTION__]) and
 		$this->_callbacks[__FUNCTION__]($return, $index, $this);
@@ -133,10 +186,16 @@ class JArray extends ArrayObject
 		isset($this->_callbacks['before_set']) and
 		$this->_callbacks['before_set']($newval, $index, $this);
 		
+		isset($this->_callbacks['before_set_' . $index]) and
+		$this->_callbacks['before_set_' . $index]($newval, $this);
+		
 		parent::offsetSet($index, $newval);
 		
 		isset($this->_callbacks['set']) and
 		$this->_callbacks['set']($newval, $index, $this);
+		
+		isset($this->_callbacks['set_' . $index]) and
+		$this->_callbacks['set_' . $index]($newval, $this);
 		
 		isset($this->_callbacks[__FUNCTION__]) and
 		$this->_callbacks[__FUNCTION__]($newval, $index, $this);
