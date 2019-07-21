@@ -30,10 +30,10 @@ if ( ! function_exists('print_array'))
 		$r = '';
 
 		$trace = debug_backtrace(false);
-		if (isset($trace[0]) && isset($trace[0]['function']) && $trace[0]['function'] === 'print_array')
-		{
-			array_shift($trace);
-		}
+//		if (isset($trace[0]) && isset($trace[0]['function']) && $trace[0]['function'] === 'print_array')
+//		{
+//			array_shift($trace);
+//		}
 
 		$file_line = '';
 		if (isset($trace[0]))
@@ -149,6 +149,7 @@ if ( ! function_exists('logger'))
 		];
 		
 		// Reordenamiento de parametros enviados
+		is_bool ($filepath) and $show = $filepath and $filepath = NULL;
 		is_bool ($code)     and $show = $code and $code = NULL;
 		is_array($severity) and is_null($meta) and $meta = $severity and $severity = NULL;
 		is_null ($code)     and $code = 0;
