@@ -6,7 +6,7 @@
  * @filesource
  */
 
-class APP
+class APP extends JArray
 {
 	//-------------------------------------------
 	// Statics
@@ -20,4 +20,12 @@ class APP
 		return $instance;
 	}
 
+	
+	/**
+     * __invoke ()
+     */
+    public function __invoke()
+    {
+		return APP::instance();
+    }
 }
