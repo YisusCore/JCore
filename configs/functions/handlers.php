@@ -7,6 +7,12 @@
  */
 
 /**
+ * Requerimientos: para usar el archivo de manera independiente
+ */
+## function logger () {}
+## function action_add () {}
+
+/**
  * DIRECTORY_SEPARATOR
  *
  * Separador de Directorios para el sistema operativo de ejecución
@@ -76,7 +82,6 @@ if ( ! function_exists('_error_handler'))
 		}
 
 		// Se envía los datos a una función especial llamada logger definida por el usuario
-		function_exists('logger') and
 		logger($message, 
 			   $severity, 
 			   $severity, 
@@ -114,7 +119,6 @@ if ( ! function_exists('_exception_handler'))
 		}
 		
 		// Se envía los datos a una función especial llamada logger definida por el usuario
-		function_exists('logger') and
 		logger($exception);
 
 		// Ya que es una exception, finaliza el proceso
@@ -137,20 +141,17 @@ if ( ! function_exists('_shutdown_handler'))
 	{
 		// Validar si se produjo la finalización por un error
 		$last_error = error_get_last();
-		
+
 		if ( isset($last_error) &&
 			($last_error['type'] & (E_ERROR | E_PARSE | E_CORE_ERROR | E_CORE_WARNING | E_COMPILE_ERROR | E_COMPILE_WARNING)))
 		{
 			_error_handler($last_error['type'], $last_error['message'], $last_error['file'], $last_error['line']);
 		}
-		
-		if (function_exists('action_apply'))
-		{
-			// Ejecutando funciones programadas
-			action_apply ('do_when_end');
-			action_apply ('shutdown');
-		}
-		
+
+		// Ejecutando funciones programadas
+		action_apply ('do_when_end');
+		action_apply ('shutdown');
+
 		flush();
 	}
 }
