@@ -97,6 +97,14 @@ class JArray extends ArrayObject
         return $this->__set($index, $newval);
     }
 
+    /**
+     * __toString ()
+     */
+	public function __toString()
+	{
+		return json_encode($this);
+	}
+
 	//-------------------------------------------
 	// Object Access
 	//-------------------------------------------
