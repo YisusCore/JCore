@@ -343,7 +343,7 @@ if ( ! function_exists('sql_data'))
 	function sql_data(string $query, $return_first = FALSE, $fields = NULL, mysqli $conection = NULL)
 	{
 		global $CON, $MYSQL_QUERY, $MYSQL_ERROR, $MYSQL_ERRNO;
-		
+
 		$MYSQL_QUERY = $query;
 		$MYSQL_ERROR = NULL;
 		$MYSQL_ERRNO = NULL;
@@ -365,36 +365,36 @@ if ( ! function_exists('sql_data'))
 		is_null($conection) and $conection = $CON;
 
 		isset($_executeds[$conection->thread_id]) or $_executeds[$conection->thread_id] = 0;
-		
+
 		$_executeds[$conection->thread_id]++;
 
 		if($_executeds[$conection->thread_id] > 1)
 		{
 			@mysqli_next_result($conection);
 		}
-		
+
 		$result =  mysqli_query($conection, $query);
-		
+
 		if ( ! $result)
 		{
 			$MYSQL_ERROR = mysqli_error($conection);
 			$MYSQL_ERRNO = mysqli_errno($conection);
-			
+
 			logger($MYSQL_ERROR, $MYSQL_ERRNO, 'BBDD: SQL Excecuted', ['query' => $query], FALSE);
-			
+
 		}
 		else
 		{
 		}
-		
+
 		if ( ! is_null($fields))
 		{
 		}
-		
+
 		if ($return_first)
 		{
 		}
-		
+
 		return $sql_data_result;
 	}
 }
