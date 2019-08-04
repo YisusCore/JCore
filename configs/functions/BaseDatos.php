@@ -382,17 +382,21 @@ if ( ! function_exists('sql_data'))
 
 			logger($MYSQL_ERROR, $MYSQL_ERRNO, 'BBDD: SQL Excecuted', ['query' => $query], FALSE);
 
+			$sql_data_result = new sql_data();
 		}
 		else
 		{
+			$sql_data_result = new sql_data($result);
 		}
 
 		if ( ! is_null($fields))
 		{
+			$sql_data_result->filter_fields($fields);
 		}
 
 		if ($return_first)
 		{
+			return $sql_data_result->first();
 		}
 
 		return $sql_data_result;
