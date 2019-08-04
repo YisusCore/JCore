@@ -30,10 +30,10 @@ if ( ! function_exists('print_array'))
 		$r = '';
 
 		$trace = debug_backtrace(false);
-//		if (isset($trace[0]) && isset($trace[0]['function']) && $trace[0]['function'] === 'print_array')
-//		{
-//			array_shift($trace);
-//		}
+		if (isset($trace[0]) && isset($trace[0]['file']) && $trace[0]['file'] === __FILE__)
+		{
+			array_shift($trace);
+		}
 
 		$file_line = '';
 		if (isset($trace[0]))
