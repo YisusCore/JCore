@@ -2995,7 +2995,7 @@ if ( ! function_exists('get_file'))
 			$externo = FALSE;
 		}
 
-		if ($externo and preg_match('#f\.jys\.pe#i', $src))
+		if ($externo and preg_match('#(f|assets|cdn|files)\.jys\.pe#i', $src))
 		{
 			$externo = FALSE;
 		}
@@ -3170,6 +3170,13 @@ if ( ! function_exists('get_file'))
 			{
 				unlink($the_file_path);
 			}
+		}
+		elseif (preg_match('/using\.js/i', $the_file))
+		{
+			$turi = 'assets.jys.pe';
+			$time= '';
+			$real_file = 'https://assets.jys.pe/' . ltrim($the_file, '/');
+			$the_file_path = $real_file;
 		}
 		elseif (preg_match('/modulator/i', $the_file))
 		{
