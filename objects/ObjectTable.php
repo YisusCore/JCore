@@ -1154,6 +1154,50 @@ class ObjectTable extends ArrayObject
 
 	
 	*/
+	
+    public function json ()
+    {
+		$json = json_decode(json_encode($this), true);
+		
+		$key_column_usage = $this::$key_column_usage;
+		$last_refs_tbls = [];
+        foreach($key_column_usage as $tbl)
+        {
+        	$TABLE_NAME = $tbl['TABLE_NAME'];
+        	$COLUMN_NAME = $tbl['COLUMN_NAME'];
+        	$REFERENCED_COLUMN_NAME = $tbl['REFERENCED_COLUMN_NAME'];
+			
+			if ( ! isset($tbl['TABLE_AS_ATTR']) or is_empty($tbl['TABLE_AS_ATTR']))
+			{
+				$attr = preg_replace('/^' . $this::$tblname . '(e)?(s)?\_/', '', $TABLE_NAME);
+        		$attr .= '_lista';
+				
+				$n = '';
+				while(in_array($attr . $n, $last_refs_tbls))
+				{
+					$n === '' and $n = 0;
+					$n++;
+				}
+
+				$attr .= $n;
+				$last_refs_tbls[] = $attr;
+			}
+			else
+			{
+				$attr = $tbl['TABLE_AS_ATTR'];
+			}
+
+			$index = $attr;
+        	
+        	if (isset($json[$index]))
+        	{
+        		unset($json[$index]);
+        	}
+        }
+		
+		
+        return json_encode($json);
+    }
 }
 
 
