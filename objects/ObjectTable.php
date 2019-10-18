@@ -419,6 +419,14 @@ class ObjectTable extends ArrayObject
 			unset($columns[$this::$key]);
 		}
 		
+		foreach(array_values($columns) as $column)
+		{
+		    if (preg_match('/GENERATED/i', $this::$columns[$column]['Extra']))
+		    {
+		        unset($columns[$column]);
+		    }
+		}
+		
 		$columns = array_values($columns);
 
 		## Ejecutar la consulta
@@ -519,6 +527,15 @@ class ObjectTable extends ArrayObject
 		{
 			unset($columns[$_column]);
 		}
+	        
+		foreach(array_values($columns) as $column)
+		{
+		    if (preg_match('/GENERATED/i', $this::$columns[$column]['Extra']))
+		    {
+		        unset($columns[$column]);
+		    }
+		}
+		
 		$columns = array_values($columns);
 		
 		## Ejecutar la consulta
