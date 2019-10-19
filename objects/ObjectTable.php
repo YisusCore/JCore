@@ -398,7 +398,7 @@ class ObjectTable extends ArrayObject
 		}
 		if (count($faltantes) > 0)
 		{
-			sql_trans(false);
+// 			sql_trans(false);
 			
 			throw new BasicException(grouping($faltantes, [
 				'prefix' => ['El campo ', 'Los campos '],
@@ -464,7 +464,7 @@ class ObjectTable extends ArrayObject
 			
 			if ($new_id === FALSE)
 			{
-				sql_trans(false);
+// 				sql_trans(false);
 
 				throw new BasicException('No se pudo ingresar el registro ' . $this::$tblname_singular, 0, ['query' => $query]);
 			}
@@ -477,7 +477,7 @@ class ObjectTable extends ArrayObject
 			
 			if ( ! $exec)
 			{
-				sql_trans(false);
+// 				sql_trans(false);
 				
 				throw new BasicException('No se pudo ingresar el registro ' . $this::$tblname_singular, 0, ['query' => $query]);
 			}
@@ -508,7 +508,7 @@ class ObjectTable extends ArrayObject
 		}
 		if (count($faltantes) > 0)
 		{
-			sql_trans(false);
+// 			sql_trans(false);
 			throw new BasicException(grouping($faltantes, [
 				'prefix' => ['El campo ', 'Los campos '],
 				'suffix' => [' es requerido', ' son requeridos'],
@@ -588,7 +588,7 @@ class ObjectTable extends ArrayObject
 		
 		if ( ! $exec)
 		{
-			sql_trans(false);
+// 			sql_trans(false);
 			throw new BasicException('No se pudo actualizar el registro ' . $this->_class);
 		}
 		
@@ -640,7 +640,7 @@ class ObjectTable extends ArrayObject
 		
 		if ( ! $exec)
 		{
-			sql_trans(false);
+// 			sql_trans(false);
 			throw new BasicException('No se pudo actualizar el registro ' . $this->_class);
 		}
 		
