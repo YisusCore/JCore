@@ -382,7 +382,7 @@ class ObjectTable extends ArrayObject
      * insert ()
      * Ingreso un registro a la TABLA de la BBDD
      */
-    public function insert ()
+    public function insert ($requireds_check = TRUE)
     {
 		$requireds = $this::$requireds;
 		$protecteds = $this::$protecteds;
@@ -396,7 +396,7 @@ class ObjectTable extends ArrayObject
 				$faltantes[] = $index;
 			}
 		}
-		if (count($faltantes) > 0)
+		if ($requireds_check and count($faltantes) > 0)
 		{
 // 			sql_trans(false);
 			
