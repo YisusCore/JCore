@@ -807,7 +807,7 @@ class ObjectTable extends ArrayObject
         		continue;
         	}
         	
-        	$this->_data[$index] = is_empty($deff) ? ($clas === 'numeric' ? 0 : ($clas === 'array' ? [] : NULL)) : NULL;
+        	$this->_data[$index] = is_empty($deff) ? ($clas === 'numeric' ? 0 : ($clas === 'array' ? [] : NULL)) : $deff;
         }
 
         $last_refs_tbls = [];
