@@ -802,7 +802,7 @@ class ObjectTable extends ArrayObject
         	
         	if (in_array($index, $referenceds))
         	{
-        		$this->_data[$index] = NULL;
+        		$this->_data[$index] = is_empty($deff) ? NULL : $deff;
         		$this->_data[preg_replace('/((_)+id|id(_)+)/i', '', $index) . '_obj'] = ['exec' => 'kcur', 'index' => $index];
         		continue;
         	}
