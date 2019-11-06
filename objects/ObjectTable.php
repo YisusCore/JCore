@@ -766,7 +766,7 @@ class ObjectTable extends ArrayObject
     {
         if ($clear)
         {
-            $this_>_clear_data();
+            $this->_clear_data();
         }
 
         $keys = $this::$keys;
@@ -786,7 +786,7 @@ class ObjectTable extends ArrayObject
 
         	$clas = $this::$columns[$index]['clas'];
         	$deff = $this::$columns[$index]['Default'];
-        	$this->_data[$index] = is_empty($deff) ? ($clas === 'numeric' ? 0 : ($clas === 'array' ? [] : NULL)) : NULL;
+        	$this->_data[$index] = is_empty($deff) ? ($clas === 'numeric' ? 0 : ($clas === 'array' ? [] : NULL)) : $deff;
         }
 
         ## añade todos los Campos
