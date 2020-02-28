@@ -617,7 +617,7 @@ WHERE TABLE_SCHEMA = '.qp_esc($TABLE_SCHEMA).' AND TABLE_NAME = '.qp_esc($tabla)
 				
 				if (is_localhost())
 				{
-					trigger_error('Está usando la configuración de JSON en MariaDB para el campo `'.$column['Field'].'`', E_USER_WARNING);
+//					trigger_error('Está usando la configuración de JSON en MariaDB para el campo `'.$column['Field'].'`', E_USER_WARNING);
 				}
 			}
 			
