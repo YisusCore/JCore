@@ -298,6 +298,9 @@ abstract class ObjTbl extends JArray
 				is_null ($rx['on_delete']) and $rx['on_delete'] = 'CASCADE';
 				is_bool ($rx['r11'])        or $rx['r11']       = FALSE;
 
+				$rx['on_update'] = mb_strtoupper($rx['on_update']);
+				$rx['on_delete'] = mb_strtoupper($rx['on_delete']);
+
 				// Añadiendo la columna corregida
 				$_rxs_hijo[$that][] = $rx;
 			}
@@ -320,6 +323,7 @@ abstract class ObjTbl extends JArray
 	 *   ],
 	 *   'field'   => NULL,           // Un valor del cual como se quiere que aparezca como campo en este objeto
 	 *   'r11'     => FALSE,          // La relación con el padre es 1-1, si ese es el caso se intenta eliminar el registro automáticamente
+	 *   'fus'     => FALSE,          // Force Update Sync, ejecuta un update al padre para que se autocalcule algún parametro o algo
 	 * ]
      */
     protected static $_rxs_padre = [];
@@ -328,7 +332,7 @@ abstract class ObjTbl extends JArray
 		$that = self::gcc();
 		return $that::$_rxs_padre;
 	}
-	
+
 	protected static function rxs_padre()
 	{
 		static $_rxs_padre = [];
@@ -347,6 +351,7 @@ abstract class ObjTbl extends JArray
 					'columnas'=> [],
 					'field'   => NULL,
 					'r11'     => FALSE,
+					'fus'     => FALSE,
 				], $rx);
 
 				// Validando que exista el atributo NOMBRE y CLASE
@@ -590,6 +595,7 @@ abstract class ObjTbl extends JArray
 
 			// Agregando a la data de la instancia
 			$this->_data_instance[$_field] = $data_keys[$_ind];
+			$this->_data_original[$_field] = $data_keys[$_ind];
 		}
 
 		//=== Buscando la información del objeto basado en los campos laves
@@ -747,33 +753,44 @@ abstract class ObjTbl extends JArray
 		}
 	}
 
+	protected function _where_sql (&$query)
+	{
+		$keys = self::keys();
+		$columns = self::columns();
+
+		$_data = $this->_found ? $this->_data_original : $this->_data_instance;
+
+		foreach($keys as $key)
+		{
+			$campo = $columns[$key];
+			
+			if (is_null($_data[$key]) and ! $campo['nn'])
+			{
+				$query.= ' AND `'.$key.'` IS NULL' . PHP_EOL;
+			}
+			else
+			{
+				$query.= ' AND `'.$key.'` = ' . qp_esc($_data[$key]) . PHP_EOL;
+			}
+		}
+	}
+
     /**
      * select
 	 * Permite hacer una consulta SELECT a la DB 
      */
 	public function select (&$_sync = [])
 	{
-		$keys = self::keys();
-		$columns = self::columns();
-		
+		$_uid = $this->_uid();
+
 		$query = '';
 		$query.= 'SELECT *' . PHP_EOL;
 		$query.= 'FROM `' . self::tblname() . '`' . PHP_EOL;
 		$query.= 'WHERE TRUE' . PHP_EOL;
 
-		foreach($keys as $key)
-		{
-			$campo = $columns[$key];
-			
-			if (is_null($this->_data_instance[$key]) and ! $campo['nn'])
-			{
-				$query.= ' AND `'.$key.'` IS NULL' . PHP_EOL;
-			}
-			else
-			{
-				$query.= ' AND `'.$key.'` = ' . qp_esc($this->_data_instance[$key]) . PHP_EOL;
-			}
-		}
+		$this->_where_sql($query);
+
+		$query.= 'LIMIT 1' . PHP_EOL;
 
 		$query = filter_apply ('ObjTbl::Select', $query, self::gcc(), $this);
 
@@ -807,7 +824,14 @@ abstract class ObjTbl extends JArray
 			}
 		}
 
-		$_sync[self::gcc()][$this->_uid()] = $this->__toArray();
+		if ($this->_found)
+		{
+			$_sync[self::gcc()][$_uid] = $this->__toArray();
+		}
+		else
+		{
+			$_sync['eliminar'][self::gcc()][] = $_uid;
+		}
 		return $this;
 	}
 
@@ -918,8 +942,11 @@ abstract class ObjTbl extends JArray
 			return false;
 		}
 
-		is_null($_ai_key) or 
-		$this[$_ai_key] = $_exec;
+		if ( ! is_null($_ai_key))
+		{
+			$this->_data_instance[$_ai_key] = $_exec;
+			$this->_data_original[$_ai_key] = $_exec;
+		}
 
 		// Obteniendo las posibles relaciones hijo que se hayan agregado mnanualmente
 		$rxs_hijo_editeds = [];
@@ -977,7 +1004,7 @@ abstract class ObjTbl extends JArray
 					$_errors = $reg_o->get_errors();
 					foreach($_errors as $_error)
 					{
-						$this->_errors[] = $_error;
+						$this->_errors[] = '[' . $reg_o::gcc() . '] ' . $_error;
 					}
 					return false;
 				}
@@ -1015,7 +1042,249 @@ abstract class ObjTbl extends JArray
 			return false;
 		}
 
+		sql_trans();
+
+		$_valid = $this->verify();
+		if ( ! $_valid)
+		{
+			sql_trans(false);
+			return false;
+		}
+
+		$_update_data_before = [];
+		$_update_data_after = [];
+		$_update_data = [];
+
+		$columns = self::columns();
+
+		foreach($columns as $column)
+		{
+			if ($column['dg'])
+			{
+				continue;
+			}
+
+			$field = $column['nombre'];
+
+			if (mb_strtolower($column['attr']) === mb_strtolower('on update CURRENT_TIMESTAMP') and 
+				 ! in_array($field, $this->_manual_setted))
+			{
+				continue;
+			}
+
+			$value = isset($this[$field]) ? $this[$field] : NULL;
+			$value_before = isset($this->_data_original[$field]) ? $this->_data_original[$field] : NULL;
+
+			if ($value_before == $value)
+			{
+				continue;
+			}
+
+			$_update_data_before[$field] = $value_before;
+			$_update_data_after[$field] = $value;
+
+			if ( ! preg_match('/(CURRENT_TIMESTAMP|NOW)(\()?(\))?/i', $value))
+			{
+				$value = qp_esc($value, ! $column['nn']);
+			}
+			$_update_data[$field] = $value;
+		}
+
+		if (count($_update_data) === 0)
+		{
+			sql_trans(false);
+			$this->_errors[] = 'No se han realizado cambios';
+			return true;
+		}
+
+		// validar los rx_hijos con on_update = 'NO ACTION' or 'RESTRICT'
+		$rxs_hijo = self::rxs_hijo();
+		foreach($rxs_hijo as $rx)
+		{
+			if ( ! in_array($rx['on_update'], ['NO ACTION', 'RESTRICT']))
+			{
+				continue;
+			}
+
+			$field = $rx['field'];
+			foreach($rx['columnas'] as $_padre => $_hijo)
+			{
+				if (isset($_update_data[$_padre]))
+				{
+					sql_trans(false);
+					$this->_errors[] = 'No se puede actualizar el campo `' . $_padre . '`';
+					return false;
+					break 2;
+				}
+			}
+		}
+
+		$query = '';
+		$query.= 'UPDATE `' . self::tblname() . '` ' . PHP_EOL;
+		$query.= 'SET';
+		$query.= implode(', ', array_map(function($o, $p){
+			return PHP_EOL . '  `' . $o . '` = ' . $p;
+		}, array_keys($_update_data), array_values($_update_data))) . PHP_EOL;
+		$query.= 'WHERE TRUE' . PHP_EOL;
+
+		$this->_where_sql($query);
+
+		$query.= 'LIMIT 1' . PHP_EOL;
+
+		$query = filter_apply ('ObjTbl::Update', $query, self::gcc(), $this);
+
+		$rxs_hijo_changeds = [];
+		$rxs_hijo = self::rxs_hijo();
+		foreach($rxs_hijo as $rx)
+		{
+			if ( ! in_array($rx['on_update'], ['CASCADE', 'SET NULL']))
+			{
+				continue;
+			}
+
+			$field = $rx['field'];
+			$data = $this->offsetGet($field);
+			$vnulo = $rx['on_update'] === 'SET NULL';
+
+			foreach($data as $reg_o)
+			{
+				$_updated = false;
+
+				foreach($rx['columnas'] as $_padre => $_hijo)
+				{
+					if (isset($_update_data[$_padre]))
+					{
+						$_updated = true;
+						$reg_o[$_hijo] = $vnulo ? NULL : $_update_data[$_padre];
+					}
+				}
+
+				if ($_updated)
+				{
+					$rxs_hijo_changeds[] = $reg_o;
+				}
+			}
+		}
+
+		$_exec = @sql($query);
 		
+		if ( ! $_exec)
+		{
+			sql_trans(false);
+			$this->_errors[] = 'No se pudo actualizar el registro `' . self::gcc() . '`';
+			return false;
+		}
+
+		// Obteniendo las posibles relaciones hijo que se hayan agregado mnanualmente
+		$rxs_hijo_editeds = [];
+		$rxs_hijo = self::rxs_hijo();
+		foreach($rxs_hijo as $rx)
+		{
+			$field = $rx['field'];
+			if (in_array($field, $this->_manual_setted))
+			{
+				$rxs_hijo_editeds[$field] = [
+					'data' => $this->_data_instance[$field],
+					'rx' => $rx
+				];
+			}
+		}
+
+		$this->select($_sync);
+
+		$_changes[] = [
+			'accion' => 'update',
+			'tabla' => self::gcc(),
+			'anterior' => $_update_data_before,
+			'nuevo' => $_update_data_after,
+		];
+
+		// Actualizar los RX_hijos cuyos campos han sido actualizados
+		foreach($rxs_hijo_changeds as $reg_o)
+		{
+			$_exec = $reg_o->update($_sync, $_changes, ($_op_level + 1));
+			if ( ! $_exec)
+			{
+				$_errors = $reg_o->get_errors();
+				foreach($_errors as $_error)
+				{
+					$this->_errors[] = '[' . $reg_o::gcc() . '] ' . $_error;
+				}
+				return false;
+			}
+		}
+
+		// Actualizar los RX_PADRES que requieren actualización
+		$rxs_padre = self::rxs_padre();
+		foreach($rxs_padre as $rx)
+		{
+			if ( ! $rx['fus'])
+			{
+				continue;
+			}
+
+			$field = $rx['field'];
+			$reg_o = $this[$field];
+
+			$_exec = $reg_o->update($_sync, $_changes, ($_op_level + 1));
+			if ( ! $_exec)
+			{
+				$_errors = $reg_o->get_errors();
+				foreach($_errors as $_error)
+				{
+					$this->_errors[] = '[' . $reg_o::gcc() . '] ' . $_error;
+				}
+				return false;
+			}
+		}
+
+		foreach($rxs_hijo_editeds as $_rx)
+		{
+			$rx = $_rx['rx'];
+			$data = $_rx['data'];
+			$class = 'Object\\' . $rx['clase'];
+
+			foreach($data as $reg)
+			{
+				$reg_o = $reg;
+
+				if ( ! is_object($reg_o) or ! is_a($reg_o, $class))
+				{
+					$reg_d = $reg_o;
+					$reg_o = new $class();
+
+					foreach($reg_d as $k => $v)
+					{
+						$reg_o[$k] = $v;
+					}
+				}
+
+				foreach($rx['columnas'] as $_padre => $_hijo)
+				{
+					$reg_o[$_hijo] = $this->_data_instance[$_padre];
+				}
+
+				$_exec = $reg_o->insert_update($_sync, $_changes, ($_op_level + 1));
+				if ( ! $_exec)
+				{
+					$_errors = $reg_o->get_errors();
+					foreach($_errors as $_error)
+					{
+						$this->_errors[] = '[' . $reg_o::gcc() . '] ' . $_error;
+					}
+					return false;
+				}
+			}
+		}
+
+		sql_trans(true);
+
+		if ($_op_level === 1)
+		{
+			action_apply('ObjTbl::Changes', $_changes, self::gcc(), $this);
+		}
+
+		return TRUE;
 	}
 
     /**
@@ -1036,10 +1305,155 @@ abstract class ObjTbl extends JArray
 		if ( ! $this->_found)
 		{
 			$this->_errors[] = '[' . self::gcc() . '](' . __FUNCTION__ . ') El objeto no existe aún';
+			return true;
+		}
+
+		sql_trans();
+
+		// validar los rx_hijos con on_delete = 'NO ACTION' or 'RESTRICT'
+		$rxs_hijo = self::rxs_hijo();
+		foreach($rxs_hijo as $rx)
+		{
+			if ( ! in_array($rx['on_delete'], ['NO ACTION', 'RESTRICT']))
+			{
+				continue;
+			}
+
+			$field = $rx['field'];
+			$data = $this->offsetGet($field);
+			if (count($data) > 0)
+			{
+				sql_trans(false);
+				$this->_errors[] = 'No se puede eliminar el registro `' . self::gcc() . '` ' . 
+								   'hasta que se eliminen los registros `' . $rx['clase'] . '`';
+				return false;
+				break;
+			}
+		}
+
+		$query = '';
+		$query.= 'DELETE FROM `' . self::tblname() . '` ' . PHP_EOL;
+		$query.= 'WHERE TRUE' . PHP_EOL;
+
+		$this->_where_sql($query);
+
+		$query.= 'LIMIT 1' . PHP_EOL;
+
+		$query = filter_apply ('ObjTbl::Delete', $query, self::gcc(), $this);
+
+		$_delete_data_before = $this->__toArray();
+
+		$rxs_hijo_changeds = [];
+		$rxs_hijo_deleteds = [];
+		$rxs_hijo = self::rxs_hijo();
+		foreach($rxs_hijo as $rx)
+		{
+			if ( ! in_array($rx['on_delete'], ['CASCADE', 'SET NULL']))
+			{
+				continue;
+			}
+
+			$field = $rx['field'];
+			$data = $this->offsetGet($field);
+			$vnulo = $rx['on_delete'] === 'SET NULL';
+
+			foreach($data as $reg_o)
+			{
+				if ($vnulo)
+				{
+					foreach($rx['columnas'] as $_padre => $_hijo)
+					{
+						$reg_o[$_hijo] = NULL;
+					}
+					$rxs_hijo_changeds[] = $reg_o;
+				}
+				else
+				{
+					$rxs_hijo_deleteds[] = $reg_o;
+				}
+			}
+		}
+
+		$_exec = @sql($query);
+		
+		if ( ! $_exec)
+		{
+			sql_trans(false);
+			$this->_errors[] = 'No se pudo eliminar el registro `' . self::gcc() . '`';
 			return false;
 		}
 
-		
+		$this->select($_sync);
+
+		$_changes[] = [
+			'accion' => 'delete',
+			'tabla' => self::gcc(),
+			'anterior' => $_delete_data_before,
+			'nuevo' => [],
+		];
+
+		// Actualizar los RX_hijos cuyos campos han sido actualizados
+		foreach($rxs_hijo_changeds as $reg_o)
+		{
+			$_exec = $reg_o->update($_sync, $_changes, ($_op_level + 1));
+			if ( ! $_exec)
+			{
+				$_errors = $reg_o->get_errors();
+				foreach($_errors as $_error)
+				{
+					$this->_errors[] = '[' . $reg_o::gcc() . '] ' . $_error;
+				}
+				return false;
+			}
+		}
+
+		// Actualizar los RX_hijos cuyos campos han sido actualizados
+		foreach($rxs_hijo_deleteds as $reg_o)
+		{
+			$_exec = $reg_o->delete($_sync, $_changes, ($_op_level + 1));
+			if ( ! $_exec)
+			{
+				$_errors = $reg_o->get_errors();
+				foreach($_errors as $_error)
+				{
+					$this->_errors[] = '[' . $reg_o::gcc() . '] ' . $_error;
+				}
+				return false;
+			}
+		}
+
+		// Actualizar los RX_PADRES que requieren actualización
+		$rxs_padre = self::rxs_padre();
+		foreach($rxs_padre as $rx)
+		{
+			if ( ! $rx['fus'])
+			{
+				continue;
+			}
+
+			$field = $rx['field'];
+			$reg_o = $this[$field];
+
+			$_exec = $reg_o->update($_sync, $_changes, ($_op_level + 1));
+			if ( ! $_exec)
+			{
+				$_errors = $reg_o->get_errors();
+				foreach($_errors as $_error)
+				{
+					$this->_errors[] = '[' . $reg_o::gcc() . '] ' . $_error;
+				}
+				return false;
+			}
+		}
+
+		sql_trans(true);
+
+		if ($_op_level === 1)
+		{
+			action_apply('ObjTbl::Changes', $_changes, self::gcc(), $this);
+		}
+
+		return TRUE;
 	}
 
     /**
@@ -1049,7 +1463,7 @@ abstract class ObjTbl extends JArray
      */
 	public function reset ()
 	{
-		
+		return $this->select();
 	}
 
 	public function offsetGet ($index)
@@ -1062,7 +1476,7 @@ abstract class ObjTbl extends JArray
 		
 		// Alojando las relaciones de objetos que dependen de este objeto
 		$rxs_hijo = self::rxs_hijo();
-		
+
 		if (is_null($_founded))
 		{
 			foreach($rxs_padre as $rx)
@@ -1108,10 +1522,49 @@ abstract class ObjTbl extends JArray
 		switch($_founded)
 		{
 			case 'rxs_padre':
-				$return = 'rxs_padre';
+				$class = 'Object\\' . $_founded_obj['clase'];
+
+				$_obj_params = [];
+				$_obj_params[] = $class;
+
+				foreach($_founded_obj['columnas'] as $_hijo => $_padre)
+				{
+					$_obj_params[] = $this->_data_original[$_hijo];
+				}
+
+				$obj = call_user_func_array('obj', $_obj_params);
+
+				$return = $obj;
 				break;
 			case 'rxs_hijo':
-				$return = 'rxs_hijo';
+				$class = 'Object\\' . $_founded_obj['clase'];
+
+				$query = '';
+				$query.= 'SELECT *' . PHP_EOL;
+				$query.= 'FROM `' . $_founded_obj['tabla'] . '`' . PHP_EOL;
+				$query.= 'WHERE TRUE' . PHP_EOL;
+
+				foreach($_founded_obj['columnas'] as $_padre => $_hijo)
+				{
+					if (is_null($this->_data_original[$_padre]))
+					{
+						$query.= ' AND `'.$_hijo.'` IS NULL' . PHP_EOL;
+					}
+					else
+					{
+						$query.= ' AND `'.$_hijo.'` = ' . qp_esc($this->_data_original[$_padre]) . PHP_EOL;
+					}
+				}
+
+				$query = filter_apply ('ObjTbl::Select', $query, self::gcc(), $this);
+
+				$data = sql_data($query);
+
+				$return = [];
+				foreach($data as $reg)
+				{
+					$return[] = $class::FromArray ($reg);
+				}
 				break;
 		}
 		
