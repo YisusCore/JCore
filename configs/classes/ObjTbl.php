@@ -909,7 +909,7 @@ abstract class ObjTbl extends JArray
 			$field = $column['nombre'];
 			$value = isset($this[$field]) ? $this[$field] : NULL;
 
-			if ( ! preg_match('/(CURRENT_TIMESTAMP|NOW)(\()?(\))?/i', $value))
+			if ( ! preg_match('/(CURRENT_TIMESTAMP|NOW|DEFAULT)(\()?(\))?/i', $value))
 			{
 				$value = qp_esc($value, ! $column['nn']);
 			}

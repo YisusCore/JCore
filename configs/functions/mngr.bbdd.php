@@ -249,8 +249,9 @@ if ( ! function_exists('qp_esc'))
 		global $CON;
 		
 		static $_reserveds = [
-			'NOW()',
-			'DEFAULT'
+			'NOW',
+			'DEFAULT',
+			'CURRENT_TIMESTAMP'
 		];
 		
 		is_null($conection) and $conection = $CON;
@@ -261,7 +262,7 @@ if ( ! function_exists('qp_esc'))
 			return $or_null;
 		}
 		
-		if (in_array($valor, $_reserveds))
+		if (preg_match('/('.implode('|', $_reserveds).')(\()?(\))?/i', $valor))
 		{
 			return $valor; ## Palabras Reservadas
 		}
