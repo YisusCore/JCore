@@ -382,8 +382,14 @@ class ObjectTable extends ArrayObject
      * insert ()
      * Ingreso un registro a la TABLA de la BBDD
      */
-    public function insert ($requireds_check = TRUE)
+    public function insert ()
     {
+		$requireds_check = TRUE;
+		if (func_num_args() > 0)
+		{
+			$requireds_check = func_get_arg(0);
+		}
+		
 		$requireds = $this::$requireds;
 		$protecteds = $this::$protecteds;
 		
