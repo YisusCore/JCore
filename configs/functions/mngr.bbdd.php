@@ -262,7 +262,7 @@ if ( ! function_exists('qp_esc'))
 			return $or_null;
 		}
 		
-		if (is_string($valor) and preg_match('/^('.implode('|', $_reserveds).')(\()?(\))?/i', $valor))
+		if (is_string($valor) and preg_match('/^('.implode('|', $_reserveds).')(\()?(\))?$/i', $valor))
 		{
 			return $valor; ## Palabras Reservadas
 		}
