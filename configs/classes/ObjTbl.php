@@ -16,6 +16,8 @@ abstract class ObjTbl extends JArray
 	const Fecha = 16;
 	const Hora = 32;
 	const Boolean = 64;
+	
+	const Ilimitado = -1;
 
 	private static function gcc ()
 	{
@@ -72,17 +74,17 @@ abstract class ObjTbl extends JArray
 	 *
 	 * Formato de los valores dentro del array
 	 * [
-	 * 	 'nombre'   => 'field',        // Nombre del campo
-	 *   'tipo'     => ObjTbl::Texto,  // El tipo del campo, por defecto será asumido como ObjTbl::Texto
-	 *   'largo'    => 99999999,       // El mb_strlen del valor del campo, por defecto es el máximo posible
-	 *   'opciones' => NULL,           // Si el campo solo tiene autorizado uno de los valores dentro de esta lista, por defecto NULO
-	 *   'defecto'  => NULL,           // El valor que tomará por defecto si no se ha asignado algún valor al campo, por defecto NULO
-	 *   'attr'     => NULL,           // Alguna atribución especial al campo tal como UNSIGNED ZEROFILL, por defecto NULO
-	 *   'nn'       => FALSE,          // Identificador si el campo es NULLABLE o no, por defecto siempre es NULLABLE
-	 *   'ne'       => TRUE,           // Si el campo es NOT NULL, se va a permitir campo vacío o no
-	 *   'ai'       => FALSE,          // Si el campo es el único KEY identifica si el valor es AUTO_INCREMENT, caso contrario no sirve
-	 *   'ag'       => NULL,           // Si el campo es autogenerado, este es el nombre de la función que devolverá el valor del campo
-	 *   'dg'       => FALSE,          // Si el campo es autogenerado mediante DATA_BASE, por tanto no se puede hacer un INSERT o UPDATE
+	 * 	 'nombre'   => 'field',        		// Nombre del campo
+	 *   'tipo'     => ObjTbl::Texto,  		// El tipo del campo, por defecto será asumido como ObjTbl::Texto
+	 *   'largo'    => ObjTbl::Ilimitado,	// El mb_strlen del valor del campo, por defecto es el máximo posible
+	 *   'opciones' => NULL,           		// Si el campo solo tiene autorizado uno de los valores dentro de esta lista, por defecto NULO
+	 *   'defecto'  => NULL,           		// El valor que tomará por defecto si no se ha asignado algún valor al campo, por defecto NULO
+	 *   'attr'     => NULL,           		// Alguna atribución especial al campo tal como UNSIGNED ZEROFILL, por defecto NULO
+	 *   'nn'       => FALSE,          		// Identificador si el campo es NULLABLE o no, por defecto siempre es NULLABLE
+	 *   'ne'       => TRUE,           		// Si el campo es NOT NULL, se va a permitir campo vacío o no
+	 *   'ai'       => FALSE,          		// Si el campo es el único KEY identifica si el valor es AUTO_INCREMENT, caso contrario no sirve
+	 *   'ag'       => NULL,           		// Si el campo es autogenerado, este es el nombre de la función que devolverá el valor del campo
+	 *   'dg'       => FALSE,          		// Si el campo es autogenerado mediante DATA_BASE, por tanto no se puede hacer un INSERT o UPDATE
 	 * ]
      */
     protected static $_columns = [];
@@ -106,7 +108,7 @@ abstract class ObjTbl extends JArray
 				$column = array_merge([
 					'nombre'   => NULL,
 					'tipo'     => ObjTbl::Texto,
-					'largo'    => 99999999,
+					'largo'    => ObjTbl::Ilimitado,
 					'opciones' => NULL,
 					'defecto'  => NULL,
 					'attr'     => NULL,
@@ -125,7 +127,7 @@ abstract class ObjTbl extends JArray
 
 				// Corrigiendo posibles atributos dañados
 				is_null ($column['tipo'])     and $column['tipo']     = ObjTbl::Texto;
-				is_null ($column['largo'])    and $column['largo']    = 99999999;
+				is_null ($column['largo'])    and $column['largo']    = ObjTbl::Ilimitado;
 				is_empty($column['opciones']) and $column['opciones'] = NULL;
 				is_empty($column['defecto'])  and $column['defecto']  = NULL;
 				is_empty($column['attr'])     and $column['attr']     = NULL;
