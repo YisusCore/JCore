@@ -471,6 +471,115 @@ abstract class ObjTbl extends JArray
 		return $instance;
 	}
 
+	public static function Lista ($filter = [], $limit = NULL, $sortby = NULL)
+	{
+		$columns = self::columns();
+		$fields = array_keys($columns);
+		
+		$_sql_where = '';
+		
+		foreach($filter as $field => $val)
+		{
+			if ( ! in_array($field, $fields))
+			{
+				continue;
+			}
+
+			$field_dats = $columns[$field];
+			$clas = $field_dats['tipo'];
+			
+			$_where = ' AND `' . $field . '`';
+			
+			if (is_array($val))
+			{
+				if ($clas === ObjTbl::Numero AND $val[0] === 'IN')
+				{
+					array_shift($val);
+					
+					if (count($val) === 0)
+					{
+						continue;
+					}
+					
+					$_where .= ' IN (' . implode(', ', array_map('qp_esc', $val)) . ')';
+				}
+				elseif ($clas === ObjTbl::Numero AND in_array($val[0], ['>', '<', '=']) AND count($val) === 2)
+				{
+					$_where .= ' ' . $val[0] . ' ' . qp_esc($val[1]);
+				}
+				elseif (in_array($clas, [ObjTbl::Numero, ObjTbl::FechaHora, ObjTbl::Fecha, ObjTbl::Hora]) AND count($val) === 2)
+				{
+					$_where .= ' BETWEEN ' . qp_esc($val[0]) . ' AND ' . qp_esc($val[1]) . '';
+				}
+//				elseif ($clas === ObjTbl::Numero AND count($val) === 3)
+//				{
+//					// Antiguo
+//					$_where .= ' ' . $val[1] . ' ' . $val[0];
+//				}
+				else
+				{
+					$_where .= ' IN (' . implode(', ', array_map('qp_esc', $val)) . ')';
+				}
+			}
+			elseif (is_null($val) and ! $field_dats['nn'])
+			{
+				$_where .= ' IS NULL';
+			}
+			elseif (in_array($clas, [ObjTbl::FechaHora, ObjTbl::Fecha, ObjTbl::Hora]))
+			{
+				$_where .= ' LIKE "' . esc($val) . '%"';
+			}
+			else
+			{
+				$_where .= ' = ' . qp_esc($val);
+			}
+			
+			$_sql_where .= $_where;
+		}
+		
+		if ( ! is_null($sortby))
+		{
+			is_array($sortby) or $sortby = (array)$sortby;
+			! isset($sortby[0]) and ! is_empty($sortby) and $sortby = [$sortby];
+			
+			$_sql_where .= ' ORDER BY ' . implode(', ', array_map(function($o){
+				$o = (array)$o;
+				
+				(isset($o[1]) and in_array($o[1], ['ASC', 'DESC'])) or $o[1] = 'DESC';
+				
+				return '`' . $o[0] . '` ' . $o[1];
+			}, $sortby));
+		}
+
+		if ( ! is_null($limit))
+		{
+			$_sql_where .= ' LIMIT ' . $limit;
+		}
+		
+		$query = 'SELECT * FROM `' . self::tblname() . '` WHERE TRUE' . $_sql_where;
+		$data = (array)sql_data($query, FALSE);
+		
+		$_return = [];
+		
+		foreach($data as $reg)
+		{
+			$_return[] = self::FromArray($reg);
+		}
+		
+		return $_return;
+	}
+
+	public static function ListaSSP ()
+	{
+		// En construcción, DataTable Server Side Processor
+	}
+
+	public static function ListaToken ()
+	{
+		// En construcción, Tokenizador de Busquedas (As Facebook)
+		// Crear tablas reales con la busqueda deseada y mediante alojamiento de otra tabla identificar el tiempo de no uso para eliminarla
+	}
+
     //========================================//
     // Atributos de Objeto                    //
     //========================================//
@@ -1471,6 +1580,32 @@ abstract class ObjTbl extends JArray
 	public function reset ()
 	{
 		return $this->select();
+	}
+	
+    /**
+     * getData()
+     * Obtiene un array con los campos requeridos
+     *
+     * @param Array $fields Campos requeridos
+     * @return Array
+     */
+	public function getData ($fields = NULL)
+	{
+		if (is_null($fields))
+		{
+			return (array)$this->_data_instance;
+		}
+		
+		$return = [];
+
+		foreach((array)$fields as $field)
+		{
+			$function = [$this, 'get_' . $field] and
+			is_callable($function) and 
+			$return[$field] = call_user_func($function);
+		}
+		
+		return (array)$return;
 	}
 
 	public function offsetGet ($index)
