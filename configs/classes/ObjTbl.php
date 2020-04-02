@@ -378,7 +378,7 @@ abstract class ObjTbl extends JArray
 				// Corrigiendo posibles atributos dañados
 				if (is_null ($rx['field']))
 				{
-					$tbl_subname = $rx['c1'] ? $rxc1_cam_padre : $rx['tabla'];
+					$tbl_subname = $rx['c1'] ? $rxc1_cam_hijo : $rx['tabla'];
 					$tbl_subname_idx = '';
 					do
 					{
@@ -422,7 +422,7 @@ abstract class ObjTbl extends JArray
 				$cam_padre = array_keys($rx['columnas']) [0];
 				$cam_hijo  = array_values($rx['columnas']) [0];
 
-				$_nexto_fields[$that][$cam_padre] = $rx['field'];
+				$_nexto_fields[$that][$cam_hijo] = $rx['field'];
 			}
 		}
 
@@ -952,12 +952,13 @@ abstract class ObjTbl extends JArray
      */
 	public function verify ()
 	{
+		// Validar No vacíos
+		$not_valids = [];
 		$columns = self::columns();
+		
 		$columns_ne = array_keys(array_filter($columns, function($o){
 			return $o['ne'];
 		}));
-
-		$not_valids = [];
 		foreach($columns_ne as $column)
 		{
 			if (is_empty($this->_data_instance[$column]))
@@ -965,7 +966,7 @@ abstract class ObjTbl extends JArray
 				$not_valids[] = $column;
 			}
 		}
-
+		
 		if (count($not_valids) > 0)
 		{
 			$this->_errors[] = grouping($not_valids, [
@@ -973,6 +974,46 @@ abstract class ObjTbl extends JArray
 				'suffix' => [' es requerido', ' son requeridos'],
 			]);
 			return false;
+		}
+
+		// Validar campos hijos
+		$rxs_padre = self::rxs_padre();
+		foreach($rxs_padre as $rx)
+		{
+			$a_null = true;
+			$_pks = [];
+			$_pkn = '';
+			
+			foreach($rx['columnas'] as $_padre => $_hijo)
+			{
+				$_valor_hijo = $this->_data_instance[$_hijo];
+				if ( ! is_null($_valor_hijo))
+				{
+					$a_null = false;
+				}
+				$_pks[] = $_valor_hijo;
+				
+				if ($rx['c1'])
+				{
+					$pkn = ' con `' . $_padre . '` = ' . $_valor_hijo;
+				}
+			}
+			
+			if ($a_null)
+			{
+				// Todos son NULL
+				continue;
+			}
+			
+			array_unshift($_pks, $rx['clase']);
+			
+			$obj_padre = call_user_func_array('obj', $_pks);
+			
+			if ( ! $obj_padre->found())
+			{
+				$this->_errors[] = 'No existe objeto `'.$rx['clase'].'`'.$pkn.' ('.$rx['field'].') #ForeignKeyError';
+				return false;
+			}
 		}
 
 		return true;
