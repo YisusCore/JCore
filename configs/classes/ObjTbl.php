@@ -18,7 +18,7 @@ abstract class ObjTbl extends JArray
 	const Boolean = 64;
 	
 	const Ilimitado = -1;
-
+	
 	private static function gcc ()
 	{
 		return get_called_class();
@@ -1061,10 +1061,7 @@ abstract class ObjTbl extends JArray
 			$field = $column['nombre'];
 			$value = isset($this[$field]) ? $this[$field] : NULL;
 
-			if ( ! (is_string($value) and preg_match('/^(CURRENT_TIMESTAMP|NOW|DEFAULT)(\()?(\))?$/i', $value)))
-			{
-				$value = qp_esc($value, ! $column['nn']);
-			}
+			$value = qp_esc($value, ! $column['nn']);
 
 			$_insert_data[$field] = $value;
 		}
@@ -1236,11 +1233,8 @@ abstract class ObjTbl extends JArray
 
 			$_update_data_before[$field] = $value_before;
 			$_update_data_after[$field] = $value;
-
-			if ( ! (is_string($value) and preg_match('/^(CURRENT_TIMESTAMP|NOW|DEFAULT)(\()?(\))?$/i', $value)))
-			{
-				$value = qp_esc($value, ! $column['nn']);
-			}
+			
+			$value = qp_esc($value, ! $column['nn']);
 			$_update_data[$field] = $value;
 		}
 
