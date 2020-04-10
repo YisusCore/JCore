@@ -620,6 +620,11 @@ abstract class ObjTbl extends JArray
 			$this->_calc_ag ();
 		};
 
+		$this->_callbacks['before_set'] = function (&$newval, &$index, $that)
+		{
+			$newval = $this->_repair_data_type($index, $newval);
+		};
+
 //		$this->_callbacks['toarray'] = function (&$arr, $that)
 //		{
 //			$arr = [];
@@ -636,10 +641,6 @@ abstract class ObjTbl extends JArray
 //			print_array('get', $return, $index);
 //		};
 //
-//		$this->_callbacks['before_set'] = function (&$newval, &$index, $that)
-//		{
-//			print_array('set', $newval, $index);
-//		};
 //
 //
 //		$this->_callbacks['before_unset'] = function (&$index, $that)
@@ -862,6 +863,63 @@ abstract class ObjTbl extends JArray
 
 			$this->_data_original[$field] = $this->_data_instance[$field];
 		}
+		
+		$this->_repair_data_type();
+	}
+
+    /**
+     * _repair_data_type
+	 * Permite corregir atributos direntes al tipo correcto
+     */
+	protected function _repair_data_type ($indice = NULL, $valor = NULL)
+	{
+		// Alojando las columnas
+		$columns = self::columns();
+
+		$return = ! is_null($valor);
+		$indices = is_null($indice) ? array_keys($columns) : [$indice];
+		
+		foreach($indices as $indice)
+		{
+			$valor = $return ? $valor : $this->_data_instance[$indice];
+			
+			if (is_empty($valor))
+			{
+				$valor = $columns[$indice]['nn'] ? ($columns[$indice]['tipo'] === ObjTbl::Arreglo ? [] : '') : NULL;
+			}
+			else
+			{
+				switch($columns[$indice]['tipo'])
+				{
+					case ObjTbl::Boolean:
+						if (is_string($valor) and in_array(mb_strtolower($valor[0]), ['f', '0']))
+						{
+							$valor = false;
+						}
+						
+						$valor = boolval($valor);
+						break;
+					case ObjTbl::Arreglo:
+						is_array($valor) or $valor = (array)$valor;
+						break;
+					case ObjTbl::Numero:
+						$valor = floatval($valor);
+						break;
+					case ObjTbl::FechaHora: case ObjTbl::Fecha: case ObjTbl::Hora:
+					case ObjTbl::Texto: default:
+						$valor = strval($valor);
+						break;
+				}
+			}
+
+			if ($return)
+			{
+				return $valor;
+			}
+			
+			$this->_data_instance[$indice] = $valor;
+		}
+		
 	}
 
 	protected function _where_sql (&$query)
