@@ -260,14 +260,16 @@ if ( ! function_exists('qp_esc'))
 			return $or_null;
 		}
 		
-		if (is_string($valor) and preg_match('/^('.implode('|', $_functions).')(\([^\)]*\))?$/i', $valor))
+		if (is_string($valor) and preg_match('/('.implode('|', $_functions).')/i', $valor))  ## Palabras Reservadas
 		{
-			return $valor; ## Palabras Reservadas
-		}
-		
-		if (is_string($valor) and preg_match('/^MF\:('.implode('|', $_functions).')(\([^\)]*\))?$/i', $valor))
-		{
-			$valor = preg_replace('/^MF\:/i', '', $valor); ## Palabras Reservadas
+			if (is_string($valor) and preg_match('/^MF\:/i', $valor))
+			{
+				$valor = preg_replace('/^MF\:/i', '', $valor);
+			}
+			else
+			{
+				return $valor;
+			}
 		}
 		
 		if (is_bool($valor))
