@@ -1061,7 +1061,7 @@ abstract class ObjTbl extends JArray
 			$field = $column['nombre'];
 			$value = isset($this[$field]) ? $this[$field] : NULL;
 
-			if ( is_string($value) and ! preg_match('/^(CURRENT_TIMESTAMP|NOW|DEFAULT)(\()?(\))?$/i', $value))
+			if ( ! (is_string($value) and preg_match('/^(CURRENT_TIMESTAMP|NOW|DEFAULT)(\()?(\))?$/i', $value)))
 			{
 				$value = qp_esc($value, ! $column['nn']);
 			}
@@ -1237,7 +1237,7 @@ abstract class ObjTbl extends JArray
 			$_update_data_before[$field] = $value_before;
 			$_update_data_after[$field] = $value;
 
-			if ( is_string($value) and  ! preg_match('/(CURRENT_TIMESTAMP|NOW)(\()?(\))?/i', $value))
+			if ( ! (is_string($value) and preg_match('/^(CURRENT_TIMESTAMP|NOW|DEFAULT)(\()?(\))?$/i', $value)))
 			{
 				$value = qp_esc($value, ! $column['nn']);
 			}
