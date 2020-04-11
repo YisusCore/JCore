@@ -1174,7 +1174,8 @@ abstract class ObjTbl extends JArray
 
 		$_changes[] = [
 			'accion' => 'insert',
-			'tabla' => self::gcc(),
+			'clase' => self::gcc(),
+			'tabla' => self::tblname(),
 			'tabla_key' => $this->_uid(),
 			'anterior' => [],
 			'nuevo' => $this->__toArray(),
@@ -1400,7 +1401,8 @@ abstract class ObjTbl extends JArray
 
 		$_changes[] = [
 			'accion' => 'update',
-			'tabla' => self::gcc(),
+			'clase' => self::gcc(),
+			'tabla' => self::tblname(),
 			'tabla_key' => $_tabla_key,
 			'anterior' => $_update_data_before,
 			'nuevo' => $_update_data_after,
@@ -1595,7 +1597,8 @@ abstract class ObjTbl extends JArray
 
 		$_changes[] = [
 			'accion' => 'delete',
-			'tabla' => self::gcc(),
+			'clase' => self::gcc(),
+			'tabla' => self::tblname(),
 			'tabla_key' => $_tabla_key,
 			'anterior' => $_delete_data_before,
 			'nuevo' => [],
