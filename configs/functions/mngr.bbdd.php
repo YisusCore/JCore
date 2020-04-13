@@ -573,6 +573,34 @@ if ( ! function_exists('sql_ect'))
 	}
 }
 
+if ( ! function_exists('sql_ec'))
+{
+	/**
+	 * sql_ec()
+	 * Valida si existe un constraint
+	 *
+	 * @param string
+	 * @param mysqli
+	 * @return bool
+	 */
+	function sql_ec ($constraint, mysqli $conection = NULL)
+	{
+		global $CON;
+		is_null($conection) and $conection = $CON;
+		
+		static $data = [];
+		
+		isset($data[$CON->_base_datos]) or 
+		$data[$CON->_base_datos] = (array)sql_data('
+		select CONSTRAINT_NAME
+		from information_schema.table_constraints
+		where CONSTRAINT_SCHEMA = ' . qp_esc($CON->_base_datos) . ' and CONSTRAINT_TYPE = "FOREIGN KEY"
+		', false, 'CONSTRAINT_NAME');
+		
+		return in_array($constraint, $data[$CON->_base_datos]);
+	}
+}
+
 if ( ! function_exists('sql_ts'))
 {
 	/**
