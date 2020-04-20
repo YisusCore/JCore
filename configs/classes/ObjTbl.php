@@ -267,13 +267,13 @@ abstract class ObjTbl extends JArray
 				// Validando que exista el atributo NOMBRE y CLASE
 				if (is_null($rx['tabla']) or is_null($rx['clase']))
 				{
-					throw new Exception ('Algunas relaciones no tienen nombre o clase');
+					throw new BasicException ('Algunas relaciones no tienen nombre o clase', __LINE__, $rx);
 				}
 
 				// Validando que exista el atributo COLUMNAS
 				if (is_empty($rx['columnas']))
 				{
-					throw new Exception ('Algunas relaciones no tienen campos');
+					throw new BasicException ('Algunas relaciones no tienen campos', __LINE__, $rx);
 				}
 
 				$rx['c1'] = count($rx['columnas']) === 1;
@@ -883,7 +883,11 @@ abstract class ObjTbl extends JArray
 		{
 			$valor = $return ? $valor : $this->_data_instance[$indice];
 			
-			if (is_empty($valor))
+			if ( ! isset($columns[$indice]))
+			{
+				
+			}
+			else if (is_empty($valor))
 			{
 				$valor = $columns[$indice]['nn'] ? ($columns[$indice]['tipo'] === ObjTbl::Arreglo ? [] : '') : NULL;
 			}
@@ -1141,7 +1145,7 @@ abstract class ObjTbl extends JArray
 		$query = filter_apply ('ObjTbl::Insert', $query, self::gcc(), $this);
 
 		$_exec = @sql($query,  ! is_null($_ai_key));
-		
+
 		if ( ! $_exec)
 		{
 			sql_trans(false);
@@ -1173,6 +1177,7 @@ abstract class ObjTbl extends JArray
 		$this->select($_sync);
 
 		$_changes[] = [
+//			'fecha_hora' => time(),
 			'accion' => 'insert',
 			'clase' => self::gcc(),
 			'tabla' => self::tblname(),
@@ -1400,6 +1405,7 @@ abstract class ObjTbl extends JArray
 		$this->select($_sync);
 
 		$_changes[] = [
+//			'fecha_hora' => time(),
 			'accion' => 'update',
 			'clase' => self::gcc(),
 			'tabla' => self::tblname(),
@@ -1596,6 +1602,7 @@ abstract class ObjTbl extends JArray
 		$this->select($_sync);
 
 		$_changes[] = [
+//			'fecha_hora' => time(),
 			'accion' => 'delete',
 			'clase' => self::gcc(),
 			'tabla' => self::tblname(),
@@ -1760,14 +1767,12 @@ abstract class ObjTbl extends JArray
 		switch($_founded)
 		{
 			case 'rxs_padre':
-				$class = 'Object\\' . $_founded_obj['clase'];
-
 				$_obj_params = [];
-				$_obj_params[] = $class;
+				$_obj_params[] = $_founded_obj['clase'];
 
 				foreach($_founded_obj['columnas'] as $_hijo => $_padre)
 				{
-					$_obj_params[] = $this->_data_original[$_hijo];
+					$_obj_params[] = $this->_data_instance[$_padre];
 				}
 
 				$obj = call_user_func_array('obj', $_obj_params);
@@ -1784,7 +1789,7 @@ abstract class ObjTbl extends JArray
 
 				foreach($_founded_obj['columnas'] as $_padre => $_hijo)
 				{
-					if (is_null($this->_data_original[$_padre]))
+					if (is_null($this->_data_instance[$_padre]))
 					{
 						$query.= ' AND `'.$_hijo.'` IS NULL' . PHP_EOL;
 					}
