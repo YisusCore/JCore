@@ -29,7 +29,7 @@ abstract class ObjTbl extends JArray
 	 * Nombre de la tabla del objeto
      */
     protected static $_tblname = NULL;
-	protected static function tblname()
+	public static function tblname()
 	{
 		$that = self::gcc();
 		return $that::$_tblname;
@@ -51,7 +51,7 @@ abstract class ObjTbl extends JArray
 	 * Si solo hay un campo clave, entonces es este
      */
     protected static $_key = NULL;
-	protected static function key()
+	public static function key()
 	{
 		$that = self::gcc();
 		return $that::$_key;
@@ -62,7 +62,7 @@ abstract class ObjTbl extends JArray
 	 * Si hay un campo o función que permita retornar el objeto como string
      */
     protected static $_toString = NULL;
-	protected static function toString()
+	public static function toString()
 	{
 		$that = self::gcc();
 		return $that::$_toString;
@@ -89,13 +89,13 @@ abstract class ObjTbl extends JArray
      */
     protected static $_columns = [];
 	
-	protected static function columns_real()
+	public static function columns_real()
 	{
 		$that = self::gcc();
 		return $that::$_columns;
 	}
 	
-	protected static function columns()
+	public static function columns()
 	{
 		static $_columns = [];
 		$that = self::gcc();
@@ -201,7 +201,7 @@ abstract class ObjTbl extends JArray
 		return $_columns[$that];
 	}
 	
-	protected static function fields()
+	public static function fields()
 	{
 		static $_fields = [];
 		$that = self::gcc();
@@ -236,13 +236,13 @@ abstract class ObjTbl extends JArray
      */
     protected static $_rxs_hijo = [];
 	
-	protected static function rxs_hijo_real()
+	public static function rxs_hijo_real()
 	{
 		$that = self::gcc();
 		return $that::$_rxs_hijo;
 	}
 	
-	protected static function rxs_hijo()
+	public static function rxs_hijo()
 	{
 		static $_rxs_hijo = [];
 		$that = self::gcc();
@@ -329,13 +329,13 @@ abstract class ObjTbl extends JArray
 	 * ]
      */
     protected static $_rxs_padre = [];
-	protected static function rxs_padre_real()
+	public static function rxs_padre_real()
 	{
 		$that = self::gcc();
 		return $that::$_rxs_padre;
 	}
 
-	protected static function rxs_padre()
+	public static function rxs_padre()
 	{
 		static $_rxs_padre = [];
 		$that = self::gcc();
@@ -403,7 +403,7 @@ abstract class ObjTbl extends JArray
 		return $_rxs_padre[$that];
 	}
 
-	protected static function rxs_padre_nexto_fields()
+	public static function rxs_padre_nexto_fields()
 	{
 		static $_nexto_fields = [];
 		$that = self::gcc();
@@ -429,7 +429,7 @@ abstract class ObjTbl extends JArray
 		return $_nexto_fields[$that];
 	}
 
-	protected static function rxs_padre_nonexto_fields()
+	public static function rxs_padre_nonexto_fields()
 	{
 		static $_nonexto_fields = [];
 		$that = self::gcc();
