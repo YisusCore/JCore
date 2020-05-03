@@ -477,7 +477,7 @@ abstract class ObjTbl extends JArray
 		$fields = array_keys($columns);
 		
 		$_sql_where = '';
-		
+
 		foreach($filter as $field => $val)
 		{
 			if ( ! in_array($field, $fields))
@@ -489,7 +489,7 @@ abstract class ObjTbl extends JArray
 			$clas = $field_dats['tipo'];
 			
 			$_where = ' AND `' . $field . '`';
-			
+
 			if (is_array($val))
 			{
 				if ($clas === ObjTbl::Numero AND $val[0] === 'IN')
@@ -520,6 +520,7 @@ abstract class ObjTbl extends JArray
 				{
 					$_where .= ' IN (' . implode(', ', array_map('qp_esc', $val)) . ')';
 				}
+				
 			}
 			elseif (is_null($val) and ! $field_dats['nn'])
 			{
@@ -904,6 +905,14 @@ abstract class ObjTbl extends JArray
 						$valor = boolval($valor);
 						break;
 					case ObjTbl::Arreglo:
+						if (is_string($valor))
+						{
+							$json = json_decode($valor, true);
+							if ( ! is_null($json))
+							{
+								$valor = $json;
+							}
+						}
 						is_array($valor) or $valor = (array)$valor;
 						break;
 					case ObjTbl::Numero:
