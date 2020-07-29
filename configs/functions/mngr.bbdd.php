@@ -491,18 +491,27 @@ if ( ! function_exists('sql_trans'))
 			$_trans[$conection->thread_id]--; ## Reducir el level
 		
 			## Solo si el level es 0 (ya se han cerrado todas las conecciones), se ejecuta el sql
-			$_trans[$conection->thread_id] === 0 and sql('COMMIT', FALSE, $conection);
+			if ($_trans[$conection->thread_id] === 0)
+			{
+				sql('COMMIT', FALSE, $conection);
+				
+				if ($_auto_commit_setted[$conection->thread_id])
+				{
+					sql('SET autocommit = 1') AND $_auto_commit_setted[$conection->thread_id] = FALSE;
+				}
+			}
 		}
 		else
 		{
 			$_trans[$conection->thread_id] = 0; ## Finalizar todas los levels abiertos
 			
 			sql('ROLLBACK', FALSE, $conection);
-		}
-		
-		if ($_auto_commit_setted[$conection->thread_id])
-		{
-			sql('SET autocommit = 1') AND $_auto_commit_setted[$conection->thread_id] = FALSE;
+
+			if ($_auto_commit_setted[$conection->thread_id])
+			{
+				sql('SET autocommit = 1') AND $_auto_commit_setted[$conection->thread_id] = FALSE;
+			}
+
 		}
 		
 		return TRUE;
