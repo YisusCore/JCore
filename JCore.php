@@ -122,7 +122,7 @@ defined('APPPATH') or define('APPPATH',  ABSPATH);
  *
  * @global
  */
-defined('ENVIRONMENT') or define('ENVIRONMENT', 'desarrollo');
+defined('ENVIRONMENT') or define('ENVIRONMENT', 'produccion');
 
 /**
  * ERROR REPORTING
