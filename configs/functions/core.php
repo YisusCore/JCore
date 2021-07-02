@@ -1265,16 +1265,16 @@ if ( ! function_exists('url'))
 			
 			//Devuelve el host (string)
 			$datos['host'] = $_parsed['host'];
-			
+
 			//Devuelve el port (int)
 			$datos['port'] = $_parsed['port'];
-			
+
 			isset($_parsed['user']) and $datos['user'] = $_parsed['user'];
 			isset($_parsed['pass']) and $datos['pass'] = $_parsed['pass'];
-			
+
 			$datos['path'] = isset($_parsed['path']) ? $_parsed['path'] : '/';
 			empty($uri_subpath) or $datos['path'] = str_replace($uri_subpath, '', $datos['path']);
-			
+
 			$datos['query'] = isset($_parsed['query']) ? $_parsed['query'] : '';
 			$datos['fragment'] = isset($_parsed['fragment']) ? $_parsed['fragment'] : '';
 			
